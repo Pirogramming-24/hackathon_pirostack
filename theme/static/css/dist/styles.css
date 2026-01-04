@@ -197,6 +197,52 @@
     display: none !important;
   }
 }
+@layer components {
+  .typo-h1 {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 600; /* semibold */
+  }
+  .typo-subtitle-1-b {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600; /* semibold */
+  }
+  .typo-subtitle-1 {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 400; /* regular */
+  }
+  .typo-subtitle-2 {
+    font-size: 1rem; /* 16px */
+    font-weight: 600; /* semibold */
+  }
+  .typo-subtitle-3 {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600; /* semibold */
+  }
+  .typo-subtitle-4 {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600; /* semibold */
+  }
+  .typo-body-1 {
+    font-size: 1rem; /* 16px */
+    font-weight: 400; /* regular */
+  }
+  .typo-body-2 {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 400; /* regular */
+  }
+  .typo-caption-1 {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 400; /* regular */
+  }
+  .typo-caption-2 {
+    font-size: 0.625rem; /* 10px */
+    font-weight: 400; /* regular */
+  }
+  .typo-caption-2-b {
+    font-size: 0.625rem; /* 10px */
+    font-weight: 700; /* bold */
+  }
+}
 @layer utilities {
   .static {
     position: static;
