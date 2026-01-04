@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}미답변 질문 - 운영진 페이지{% endblock %}
+
+{% block extra_css %}
+<style>
+    .question-card {
+        background-color: white;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-decoration: none;
+        color: #333;
+        display: block;
+    }
+    .question-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .question-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .question-meta {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+        background-color: #e74c3c;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>미답변 질문 목록</h1>
+<p>아직 답변이 없는 질문들입니다.</p>
+
+{% if questions %}
+    {% for question in questions %}
+        <a href="{% url 'questions:detail' question.pk %}" class="question-card">
+            <div class="question-title">
+                <span class="badge">미답변</span>
+                {{ question.title }}
+            </div>
+            <div class="question-meta">
+                카테고리: {{ question.category.name }} |
+                작성자: {% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %} |
+                작성일: {{ question.created_at|date:"Y-m-d H:i" }}
+            </div>
+        </a>
+    {% endfor %}
+{% else %}
+    <p>모든 질문에 답변이 달렸습니다!</p>
+{% endif %}
+{% endblock %}

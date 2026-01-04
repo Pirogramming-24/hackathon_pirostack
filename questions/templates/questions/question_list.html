@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}질문 게시판{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    .categories {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    .category-btn {
+        padding: 0.5rem 1rem;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        color: #333;
+    }
+    .category-btn.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+    .question-card {
+        background-color: white;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-decoration: none;
+        color: #333;
+        display: block;
+        transition: transform 0.2s;
+    }
+    .question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .question-card.resolved {
+        opacity: 0.6;
+        text-decoration: line-through;
+    }
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    .question-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .question-meta {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+    }
+    .badge-resolved {
+        background-color: #27ae60;
+        color: white;
+    }
+    .badge-category {
+        background-color: #3498db;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>질문 게시판</h1>
+    <a href="{% url 'questions:create' %}" class="btn">질문하기</a>
+</div>
+
+<div class="categories">
+    <a href="{% url 'questions:list' %}" class="category-btn {% if not selected_category %}active{% endif %}">전체</a>
+    {% for category in categories %}
+        <a href="{% url 'questions:list_by_category' category.id %}"
+           class="category-btn {% if selected_category.id == category.id %}active{% endif %}">
+            {{ category.name }}
+        </a>
+    {% endfor %}
+</div>
+
+{% if questions %}
+    {% for question in questions %}
+        <a href="{% url 'questions:detail' question.pk %}" class="question-card {% if question.is_resolved %}resolved{% endif %}">
+            <div class="question-header">
+                <div class="question-title">
+                    {% if question.is_resolved %}✓{% endif %} {{ question.title }}
+                </div>
+                <div>
+                    <span class="badge badge-category">{{ question.category.name }}</span>
+                    {% if question.is_resolved %}
+                        <span class="badge badge-resolved">해결됨</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="question-meta">
+                작성자: {% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %} |
+                작성일: {{ question.created_at|date:"Y-m-d H:i" }} |
+                답변: {{ question.answers.count }}개
+            </div>
+        </a>
+    {% endfor %}
+{% else %}
+    <p>아직 질문이 없습니다.</p>
+{% endif %}
+{% endblock %}
