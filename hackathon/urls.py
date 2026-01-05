@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='/questions/', permanent=False)),
     path('questions/', include('questions.urls')),
+    path('discussions/',include('discussions.urls')),
 ]
 
 if settings.DEBUG:
