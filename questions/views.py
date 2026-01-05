@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Question, Category
+from .models import Question, Category, Answer
 from .forms import QuestionForm, AnswerForm
 
 # Create your views here.
@@ -117,6 +117,49 @@ def question_delete(request, pk):
     if request.method == "POST":
         question.delete()
         return redirect("questions:list")
+    return redirect("questions:detail", pk=pk)
+
+
+def question_scrap(request, pk):
+    """질문 찜하기 토글"""
+    question = get_object_or_404(Question, pk=pk)
+
+    if request.method == "POST":
+        # 익명 사용자도 세션 기반으로 처리 가능하도록
+        # TODO: 로그인 구현되면 request.user 사용
+        # 현재는 간단히 전체 카운트만 증가/감소
+
+        # 임시: 세션 기반 찜하기
+        scrapped = request.session.get(f'scrapped_{pk}', False)
+        request.session[f'scrapped_{pk}'] = not scrapped
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({
+                "scrapped": not scrapped,
+                "scrap_count": question.scraps.count()
+            })
+
+        return redirect("questions:detail", pk=pk)
+
+    return redirect("questions:detail", pk=pk)
+
+
+def reply_create(request, pk, answer_pk):
+    """꼬리질문(답변에 대한 대댓글) 작성"""
+    question = get_object_or_404(Question, pk=pk)
+    parent_answer = get_object_or_404(Answer, pk=answer_pk)
+
+    if request.method == "POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.question = question
+            reply.parent = parent_answer
+            reply.author = None
+            reply.is_anonymous = True
+            reply.is_staff = False
+            reply.save()
+
     return redirect("questions:detail", pk=pk)
 
 
