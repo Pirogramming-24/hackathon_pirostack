@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import DiscussionPost
+from .models import DiscussionPost, DiscussionComment
 from django.contrib.auth import get_user_model # 임시
 # from django.contrib.auth.decorators import login_required
 User = get_user_model() # 임시
@@ -19,7 +19,11 @@ def post_list(request):
 
 def post_detail(request, post_id):
     post = get_object_or_404(DiscussionPost, id=post_id)
-    return render(request,'discussions/post_detail.html',{'post':post})
+    comments = post.comments.order_by('created_at')
+    return render(request,'discussions/post_detail.html',{
+        'post':post,
+        'comments':comments
+    })
 
 # @login_required
 def post_create(request):
@@ -39,3 +43,17 @@ def post_create(request):
         return redirect('discussions:post_list')
     
     return render(request,'discussions/post_form.html')
+
+def comment_create(request,post_id):
+    post = get_object_or_404(DiscussionPost,id=post_id)
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+
+        DiscussionComment.objects.create(
+            post=post,
+            author=User.objects.first(), # 임시 -> author=request.user
+            content=content
+        )
+    return redirect('discussions:post_detail',post_id=post_id)
+

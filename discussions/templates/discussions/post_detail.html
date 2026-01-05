@@ -12,6 +12,7 @@
     {{ post.created_at|date:"Y-m-d H:i" }}
 </p>
 
+<!-- 게시글 내용 -->
 <hr>
 
 <p style="white-space: pre-line;">
@@ -35,4 +36,29 @@
 <p>
     <a href="{% url 'discussions:post_list' %}">←목록으로</a>
 </p>
+
+
+<!-- 댓글 부분 -->
+<hr>
+
+<h3>댓글</h3>
+
+{% for comment in comments %}
+    <div style="margin-bottom: 10px;">
+        <strong>{{ comment.author }}</strong>
+        <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+        <p>{{ comment.content }}</p>
+    </div>
+{% empty %}
+    <p>아직 댓글이 없습니다.</p>
+{% endfor %}
+
+<hr>
+
+<form method="post" action="{% url 'discussions:comment_create' post.id %}">
+    {% csrf_token %}
+    <textarea name="content" rows="3" style="width: 100%;" required></textarea>
+    <button type="submit">댓글 등록</button>
+</form>
+
 {% endblock %}
