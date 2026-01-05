@@ -1,22 +1,33 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="overflow-y-scroll">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PirpStack{% endblock %}</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
     {% tailwind_css %}
+    <style>
+        html {
+            overflow-x: hidden;
+            overflow-y: scroll;
+            overscroll-behavior-y: none;
+        }
+        body {
+            overscroll-behavior-y: none;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-white text-black" style="font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif; line-height: 1.4; letter-spacing: -0.025em;">
-    <nav class="bg-[#059212] px-8 py-6 shadow-lg">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#059212] px-8 py-6 shadow-lg">
         <div class="max-w-7xl mx-auto">
             <a href="{% url 'questions:list' %}" class="text-white text-2xl font-semibold tracking-tight">PIRO Q&A</a>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-8 py-8">
+    <div class="max-w-7xl mx-auto px-8 py-8 mt-[88px]">
         {% block content %}{% endblock %}
     </div>
 
