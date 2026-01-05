@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import Question, Category, Answer
 from .forms import QuestionForm, AnswerForm
+from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Count
+
 
 # Create your views here.
 
@@ -163,11 +166,56 @@ def reply_create(request, pk, answer_pk):
     return redirect("questions:detail", pk=pk)
 
 
+# def staff_required(user):
+#     return user.is_authenticated and user.is_staff
+
+# @user_passes_test(staff_required, login_url="/")
+
+
+
+
+
 def staff_unanswered(request):
+    questions = Question.objects.filter(is_resolved=False)
+
+    # 미답변 질문
+    only_unanswered_param = request.GET.get("only_unanswered")
+    if only_unanswered_param == "1":
+        only_unanswered = "1"
+    else:
+        only_unanswered = "0"
+    questions = Question.objects.all()
+    if only_unanswered == "1":
+        questions = questions.filter(is_resolved=False)
+
+
+    # 필터링
+    sort = request.GET.get("sort", "latest")
+    if sort == "latest":
+        questions = questions.order_by("-created_at")
+    elif sort == "oldest":
+        questions = questions.order_by("created_at")
+
+    # 카테고리 필터
+    category_id = request.GET.get("category")
+    if category_id:
+        questions = questions.filter(category_id=category_id)
+
+    # 통계
+    total_unanswered = Question.objects.filter(is_resolved=False).count() # 전체
+    category_stats = ( # 카테고리별 미답변 개수
+        Question.objects.filter(is_resolved=False)
+        .values("category__name")
+        .annotate(count=Count("id"))
+    )
+
     """
     [김서윤] 운영진 대시보드
     TODO: 미답변 질문 리스트 필터링 및 통계 기능 구현
     """
-    # 에러 방지를 위한 기본 구현 (미해결 질문만 표시)
-    questions = Question.objects.filter(is_resolved=False)
-    return render(request, "questions/staff_unanswered.html", {"questions": questions})
+    return render(request, "questions/staff_unanswered.html", {
+    "questions": questions,
+    "sort": sort,
+    "only_unanswered": only_unanswered,
+    "total_unanswered": total_unanswered,
+    "category_stats": category_stats,})
