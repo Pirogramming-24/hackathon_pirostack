@@ -166,13 +166,17 @@ def reply_create(request, pk, answer_pk):
     return redirect("questions:detail", pk=pk)
 
 
+
+
+
+
+"""
+[김서윤] 운영진 대시보드
+"""
 # def staff_required(user):
 #     return user.is_authenticated and user.is_staff
 
 # @user_passes_test(staff_required, login_url="/")
-
-
-
 
 
 def staff_unanswered(request):
@@ -209,13 +213,61 @@ def staff_unanswered(request):
         .annotate(count=Count("id"))
     )
 
-    """
-    [김서윤] 운영진 대시보드
-    TODO: 미답변 질문 리스트 필터링 및 통계 기능 구현
-    """
     return render(request, "questions/staff_unanswered.html", {
     "questions": questions,
     "sort": sort,
     "only_unanswered": only_unanswered,
     "total_unanswered": total_unanswered,
     "category_stats": category_stats,})
+
+
+
+def category_list(request):
+    """카테고리 리스트"""
+    sort = request.GET.get("sort", "latest")  # latest = 세션, oldest = 과제
+    if sort == "latest":
+        categories = Category.objects.filter(category_type="session").order_by("-created_at")
+    else:
+        categories = Category.objects.filter(category_type="assignment").order_by("-created_at")
+
+    return render(request, "questions/category_list.html", {
+        "categories": categories,
+        "sort": sort,
+    })
+
+
+def category_create(request):
+    """카테고리 생성"""
+    if request.method == "POST":
+        name = request.POST.get("name")
+        category_type = request.POST.get("category_type", "session")
+        if name:
+            Category.objects.create(name=name, category_type=category_type)
+            return redirect("questions:category_list")
+
+    return render(request, "questions/category_form.html", {"action": "add"})
+
+
+def category_update(request, pk):
+    """카테고리 수정"""
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == "POST":
+        name = request.POST.get("name")
+        category_type = request.POST.get("category_type")
+        if name:
+            category.name = name
+            category.category_type = category_type
+            category.save()
+            return redirect("questions:category_list")
+
+    return render(request, "questions/category_form.html", {"category": category, "action": "edit"})
+
+
+def category_delete(request, pk):
+    """카테고리 삭제"""
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == "POST":
+        category.delete()
+        return redirect("questions:category_list")
+
+    return render(request, "questions/category_confirm_delete.html", {"category": category})
