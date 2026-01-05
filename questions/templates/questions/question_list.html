@@ -89,11 +89,25 @@
 </div>
 
 <div class="categories">
-    
+
   <a href="{% url 'questions:list' %}"
      class="category-btn {% if not selected_category %}active{% endif %}">
     전체
   </a>
+  <!-- 검색 폼 추가 -->
+<form id="searchForm" style="display:flex; gap:8px; align-items:center;">
+  <input
+    id="searchInput"
+    type="text"
+    name="q"
+    placeholder="검색어를 입력하세요"
+    value="{{ q|default:'' }}"
+    style="padding:8px 10px; border:1px solid #ddd; border-radius:6px;"
+  />
+  <button type="submit" class="btn">검색</button>
+</form>
+
+  
   <!--카테고리 선택:드롭다운-->
   <select id="categorySelect" class="category-select">
     <option value="">카테고리 선택</option>
@@ -118,17 +132,30 @@
   function goWithFilters() {
     const categoryId = document.getElementById("categorySelect").value;
     const sort = document.getElementById("sortSelect").value || "latest";
+    const q = document.getElementById("searchInput")?.value?.trim() || "";
 
     // 카테고리 선택 안 했으면 전체 페이지로, 선택했으면 카테고리 페이지로
     const baseUrl = categoryId
       ? "{% url 'questions:list_by_category' 0 %}".replace("/0/", "/" + categoryId + "/")
       : "{% url 'questions:list' %}";
 
-    location.href = baseUrl + "?sort=" + encodeURIComponent(sort);
+    const params = new URLSearchParams(window.location.search);
+    params.set("sort", sort);
+
+    if(q) params.set("q", q);
+    else params.delete("q");
+
+    const qs = params.toString();
+    location.href = qs ? `${baseUrl}?${qs}` : baseUrl;
   }
 
   document.getElementById("categorySelect").addEventListener("change", goWithFilters);
   document.getElementById("sortSelect").addEventListener("change", goWithFilters);
+
+  document.getElementById("searchForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    goWithFilters();
+  });
 </script>
 
 

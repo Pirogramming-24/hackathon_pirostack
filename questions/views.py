@@ -2,15 +2,20 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import Question, Category
 from .forms import QuestionForm, AnswerForm
-
+from django.db.models import Q
 # Create your views here.
 
 
 def question_list(request):
     """전체 질문 목록"""
+    #검색
     questions = Question.objects.all()
+    q = request.GET.get("q", "").strip()
+    if q:
+        questions = questions.filter(Q(title__icontains=q) | Q(content__icontains=q))
+        
+    #정렬
     sort_param = request.GET.get("sort", "latest")
-
     if sort_param =="oldest":
         questions = questions.order_by("created_at", "id")
     else:
@@ -22,6 +27,8 @@ def question_list(request):
         "selected_sort": sort_param,
         "selected_category":None,
     }
+    
+
     return render(request, "questions/question_list.html", context)
 
 
@@ -32,7 +39,6 @@ def question_list_by_category(request, category_id):
     [이서현] 카테고리별, 과제별, 시간순 정렬 및 필터링
     TODO: 커스텀 정렬 API 및 필터링 뷰 구현
     """
-
     # 에러 방지를 위한 기본 구현
     category = get_object_or_404(Category, pk=category_id)  
     questions = Question.objects.filter(category=category)    
@@ -43,9 +49,14 @@ def question_list_by_category(request, category_id):
     session_categories = Category.objects.filter(category_type="session").order_by("name")
     assignment_categories = Category.objects.filter(category_type="assignment").order_by("name")
 
+     #질문 검색
+    q = request.GET.get("q", "").strip()
 
- 
-    
+    if q:
+        questions = questions.filter(
+            Q(title__icontains=q) | Q(content__icontains=q)
+        )
+
     #시간순 정렬 
     if sort_param == "oldest":
         #오래된 순
@@ -61,12 +72,13 @@ def question_list_by_category(request, category_id):
         "categories": categories,
         "selected_category": category,
 
-        #현재 선택된 필터 상태도 같이 넘겨두면 템플릿에서 선택값 유지하기 용이함
         "session_categories": session_categories,
         "assignment_categories": assignment_categories,
         "selected_sort": sort_param,
+        "q":q,
     }
 
+   
     #질문 리스트 페이지 렌더링
     return render(request, "questions/question_list.html", context)
 
