@@ -6,5 +6,5 @@ from django.contrib.auth.models import User
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['role','nickname','name','phone_number','password','permission']
+    list_display = ['role','phone_number','password','permission']
     
