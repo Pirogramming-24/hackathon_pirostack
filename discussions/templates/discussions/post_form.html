@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if post %}
+게시글 수정
+{% else %}
+게시글 작성
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>
+    {% if post %}
+    게시글 수정
+    {% else %}
+    게시글 작성
+    {% endif %}
+</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <p>
+        <label>제목</label><br>
+        <input type="text" name="title" required value="{{ post.title|default:'' }}">
+    </p>
+
+    <p>
+        <label>내용</label><br>
+        <textarea name="content" rows="8" required>{{ post.content|default:'' }}</textarea>
+    </p>
+
+    <p>
+        <label>참고 링크</label><br>
+        <input type="url" name="link" value="{{ post.link|default:'' }}">
+    </p>
+
+    <p>
+        <label>이미지</label><br>
+        <input type="file" name="image">
+        {% if post.image %}
+            <br>
+            <small>기존 이미지가 있습니다</small>
+        {% endif %}
+    </p>
+
+    <button type="submit">저장</button>
+    <a href="{% url 'discussions:post_list' %}">목록으로</a>
+</form>
+{% endblock %}

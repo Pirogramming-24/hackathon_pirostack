@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+Discussions
+{% endblock %}
+
+{% block content %}
+<h1>커뮤니티</h1>
+
+<!-- 새 글 작성 버튼 -->
+<a href="{% url 'discussions:post_create' %}">+ 새 글 작성</a>
+
+<!-- 정렬 -->
+<p>
+    {% if sort == 'latest' %}
+        <strong>최신순</strong>
+    {% else %}
+        <a href="?sort=latest">최신순</a>
+    {% endif %}
+    |
+    {% if sort == 'oldest' %}
+        <strong>오래된순</strong>
+    {% else %}
+        <a href="?sort=oldest">오래된순</a>
+    {% endif %}
+</p>
+
+<hr>
+
+{% if posts %}
+    {% for post in posts %}
+        <div style="margin-bottom: 24px;">
+            <a href="{% url 'discussions:post_detail' post.id %}">
+                {{ post.title }}
+            </a>
+            <p>{{ post.content|truncatechars:100 }}</p>
+            <small>{{ post.created_at|date:"Y-m-d H:i" }}</small>
+        </div>
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>아직 게시글이 없습니다.</p>
+{% endif %}
+{% endblock %}
