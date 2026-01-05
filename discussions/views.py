@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import DiscussionPost, DiscussionComment
 from django.contrib.auth import get_user_model # 임시
 # from django.contrib.auth.decorators import login_required
+# from django.http import HttpResponseForbidden
 User = get_user_model() # 임시
 
 # Create your views here.
@@ -46,7 +47,6 @@ def post_create(request):
 
 def comment_create(request,post_id):
     post = get_object_or_404(DiscussionPost,id=post_id)
-
     if request.method == 'POST':
         content = request.POST.get('content')
 
@@ -57,3 +57,19 @@ def comment_create(request,post_id):
         )
     return redirect('discussions:post_detail',post_id=post_id)
 
+# @login_required
+def post_edit(request,post_id):
+    post = get_object_or_404(DiscussionPost,id=post_id)
+
+    # if post.author != request.user:
+    #    return HttpResponseForbidden("수정 권한이 없습니다.")
+    
+    if (request.method == 'POST'):
+        post.title=request.POST.get('title')
+        post.content = request.POST.get('content')
+        post.link = request.POST.get('link')
+        if (request.FILES.get('image')):
+            post.image = request.FILES.get('image')
+        post.save()
+        return redirect('discussions:post_detail',post_id=post.id)
+    return render(request,'discussions/post_form.html',{'post':post})

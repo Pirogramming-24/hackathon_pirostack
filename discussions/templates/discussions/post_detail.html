@@ -34,6 +34,10 @@
 {% endif %}
 
 <p>
+    <a href="{% url 'discussions:post_edit' post.id %}">수정</a>
+</p>
+
+<p>
     <a href="{% url 'discussions:post_list' %}">←목록으로</a>
 </p>
 
