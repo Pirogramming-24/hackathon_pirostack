@@ -5,42 +5,35 @@ Discussions
 {% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">커뮤니티</h1>
+<h1>커뮤니티</h1>
 
-<!-- (최신순, 오래된순) 정렬 버튼 -->
-<div class="mb-4 text-sm text-gray-600">
+<!-- 정렬 -->
+<p>
     {% if sort == 'latest' %}
-        <span class="font-semibold">최신순</span>
+        <strong>최신순</strong>
     {% else %}
-        <a href="?sort=latest" class="hover:underline">최신순</a>
+        <a href="?sort=latest">최신순</a>
     {% endif %}
     |
     {% if sort == 'oldest' %}
-        <span class="font-semibold">오래된순</span>
+        <strong>오래된순</strong>
     {% else %}
-        <a href="?sort=oldest" class="hover:underline">오래된순</a>
+        <a href="?sort=oldest">오래된순</a>
     {% endif %}
-</div>
+</p>
+
+<hr>
 
 {% if posts %}
-    <div class="space-y-6">
-        {% for post in posts %}
-            <div class="border-b pb-4">
-                <h2 class="text-lg font-semibold">
-                    {{ post.title }}
-                </h2>
-
-                <p class="text-gray-700 mt-1">
-                    {{ post.content|truncatechars:100 }}
-                </p>
-
-                <div class="text-sm text-gray-500 mt-2">
-                    {{ post.created_at|date:"Y-m-d H:i" }}
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+    {% for post in posts %}
+        <div style="margin-bottom: 24px;">
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.content|truncatechars:100 }}</p>
+            <small>{{ post.created_at|date:"Y-m-d H:i" }}</small>
+        </div>
+        <hr>
+    {% endfor %}
 {% else %}
-    <p class="text-gray-500">아직 게시글이 없습니다.</p>
+    <p>아직 게시글이 없습니다.</p>
 {% endif %}
 {% endblock %}
