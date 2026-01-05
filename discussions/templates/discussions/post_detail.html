@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ post.title }}
+{% endblock %}
+
+{% block content %}
+<h1>{{ post.title }}</h1>
+
+<p>
+    작성자: {{ post.author }} |
+    {{ post.created_at|date:"Y-m-d H:i" }}
+</p>
+
+<hr>
+
+<p style="white-space: pre-line;">
+    {{ post.content }}
+</p>
+
+{% if post.image %}
+    <div>
+        <img src="{{ post.image.url }}" style="max-width: 100%;">
+    </div>
+{% endif %}
+
+{% if post.link %}
+    <p>
+        <a href="{{ post.link }}" target="_blank">
+            참고 링크
+        </a>
+    </p>
+{% endif %}
+
+<p>
+    <a href="{% url 'discussions:post_list' %}">←목록으로</a>
+</p>
+{% endblock %}
