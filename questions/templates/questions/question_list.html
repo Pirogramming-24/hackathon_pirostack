@@ -86,6 +86,8 @@
 <div class="header">
     <h1>질문 게시판</h1>
     <a href="{% url 'questions:create' %}" class="btn">질문하기</a>
+    <a href="{% url 'questions:my_questions' %}" class="btn">내가 쓴 글</a>
+    <a href="{% url 'questions:my_scrapped_questions' %}" class="btn">찜한 글</a>
 </div>
 
 <div class="categories">
@@ -133,6 +135,7 @@
     const categoryId = document.getElementById("categorySelect").value;
     const sort = document.getElementById("sortSelect").value || "latest";
     const q = document.getElementById("searchInput")?.value?.trim() || "";
+    const scope = document.getElementById("scopeSelect")?.value || "all";
 
     // 카테고리 선택 안 했으면 전체 페이지로, 선택했으면 카테고리 페이지로
     const baseUrl = categoryId
@@ -141,6 +144,8 @@
 
     const params = new URLSearchParams(window.location.search);
     params.set("sort", sort);
+    params.set("scope", scope);
+
 
     if(q) params.set("q", q);
     else params.delete("q");
@@ -151,6 +156,7 @@
 
   document.getElementById("categorySelect").addEventListener("change", goWithFilters);
   document.getElementById("sortSelect").addEventListener("change", goWithFilters);
+  document.getElementById("scopeSelect").addEventListener("change", goWithFilters);
 
   document.getElementById("searchForm").addEventListener("submit", function(e){
     e.preventDefault();
@@ -160,26 +166,45 @@
 
 
 {% if questions %}
-    {% for question in questions %}
-        <a href="{% url 'questions:detail' question.pk %}" class="question-card {% if question.is_resolved %}resolved{% endif %}">
-            <div class="question-header">
-                <div class="question-title">
-                    {% if question.is_resolved %}✓{% endif %} {{ question.title }}
-                </div>
-                <div>
-                    <span class="badge badge-category">{{ question.category.name }}</span>
-                    {% if question.is_resolved %}
-                        <span class="badge badge-resolved">해결됨</span>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="question-meta">
-                작성자: {% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %} |
-                작성일: {{ question.created_at|date:"Y-m-d H:i" }} |
-                답변: {{ question.answers.count }}개
-            </div>
-        </a>
-    {% endfor %}
+{% for question in questions %}
+  <div class="question-card {% if question.is_resolved %}resolved{% endif %}"
+       style="position:relative;">
+    <!--찜 버튼-->
+    <form method="post" action="{% url 'questions:toggle_scrap' question.pk %}"
+          style="position:absolute; top:12px; right:12px; z-index:10;">
+      {% csrf_token %}
+      <button type="submit"
+              style="border:none; background:transparent; font-size:22px; cursor:pointer;
+                     color:#facc15; text-shadow:0 0 1px rgba(0,0,0,0.25);">
+        {% if user in question.scraps.all %}★{% else %}☆{% endif %}
+      </button>
+    </form>
+
+    <!--카드 내용-->
+    <a href="{% url 'questions:detail' question.pk %}" style="display:block; padding:16px; text-decoration:none; color:inherit;">
+      <div class="question-header">
+        <div class="question-title">
+          {% if question.is_resolved %}✓{% endif %} {{ question.title }}
+        </div>
+        <div>
+          <span class="badge badge-category">{{ question.category.name }}</span>
+          {% if question.is_resolved %}
+            <span class="badge badge-resolved">해결됨</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="question-meta">
+        작성자: {% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %} |
+        작성일: {{ question.created_at|date:"Y-m-d H:i" }} |
+        답변: {{ question.answers.count }}개
+      </div>
+    </a>
+
+  </div>
+{% endfor %}
+
+
 {% else %}
     <p>아직 질문이 없습니다.</p>
 {% endif %}
