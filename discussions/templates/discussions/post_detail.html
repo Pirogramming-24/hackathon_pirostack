@@ -33,9 +33,25 @@
     </p>
 {% endif %}
 
-<p>
+<!-- 로그인 연동 후 -->
+ {% comment %}
+ 로그인 연동 후 작성자만 수정/삭제 가능
+{% if user.is_authenticated and post.author == user %}
     <a href="{% url 'discussions:post_edit' post.id %}">수정</a>
-</p>
+
+    <form method="post" action="{% url 'discussions:post_delete' post.id %}">
+        {% csrf_token %}
+        <button type="submit">삭제</button>
+    </form>
+{% endif %}
+{% endcomment %}
+
+<!-- 임시 -->
+<a href="{% url 'discussions:post_edit' post.id %}">수정</a>
+<form method="post" action="{% url 'discussions:post_delete' post.id %}">
+    {% csrf_token %}
+    <button type="submit">삭제</button>
+</form>
 
 <p>
     <a href="{% url 'discussions:post_list' %}">←목록으로</a>

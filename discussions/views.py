@@ -45,6 +45,7 @@ def post_create(request):
     
     return render(request,'discussions/post_form.html')
 
+# @login_required
 def comment_create(request,post_id):
     post = get_object_or_404(DiscussionPost,id=post_id)
     if request.method == 'POST':
@@ -63,7 +64,7 @@ def post_edit(request,post_id):
 
     # if post.author != request.user:
     #    return HttpResponseForbidden("수정 권한이 없습니다.")
-    
+
     if (request.method == 'POST'):
         post.title=request.POST.get('title')
         post.content = request.POST.get('content')
@@ -73,3 +74,14 @@ def post_edit(request,post_id):
         post.save()
         return redirect('discussions:post_detail',post_id=post.id)
     return render(request,'discussions/post_form.html',{'post':post})
+
+# @login_required
+def post_delete(request,post_id):
+    post = get_object_or_404(DiscussionPost,id=post_id)
+
+    # if post.author != request.user:
+    #    return HttpResponseForbidden("삭제 권한이 없습니다.")
+
+    if request.method == 'POST':
+        post.delete()
+    return redirect('discussions:post_list')
