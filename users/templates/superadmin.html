@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="content">
+        <form method="POST">
+            {% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>전화번호</th>
+                        <th>승인 버튼</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in people %}
+                    {% if not profile.permission %}
+                    <tr>
+                        <td>{{ profile.name }}</td>
+                        <td>{{ profile.phone_number }}</td>
+                        <td><button type="submit" name="admit_btn" value="{{profile.id}}">승인</button></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</body>
+</html>
