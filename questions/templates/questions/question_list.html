@@ -89,14 +89,48 @@
 </div>
 
 <div class="categories">
-    <a href="{% url 'questions:list' %}" class="category-btn {% if not selected_category %}active{% endif %}">전체</a>
-    {% for category in categories %}
-        <a href="{% url 'questions:list_by_category' category.id %}"
-           class="category-btn {% if selected_category.id == category.id %}active{% endif %}">
-            {{ category.name }}
-        </a>
+    
+  <a href="{% url 'questions:list' %}"
+     class="category-btn {% if not selected_category %}active{% endif %}">
+    전체
+  </a>
+  <!--카테고리 선택:드롭다운-->
+  <select id="categorySelect" class="category-select">
+    <option value="">카테고리 선택</option>
+
+    {% for c in categories %}
+      <option value="{{ c.id }}"
+        {% if selected_category and selected_category.id == c.id %}selected{% endif %}>
+        {{ c.name }} 
+      </option>
     {% endfor %}
+  </select>
+
+  <!--정렬 선택 드롭다운-->
+  <select id="sortSelect" class="category-select">
+    <option value="latest" {% if selected_sort != "oldest" %}selected{% endif %}>최신순</option>
+    <option value="oldest" {% if selected_sort == "oldest" %}selected{% endif %}>오래된순</option>
+  </select>
 </div>
+
+<script>
+  // 선택값으로 URL 만들고 이동하는 함수
+  function goWithFilters() {
+    const categoryId = document.getElementById("categorySelect").value;
+    const sort = document.getElementById("sortSelect").value || "latest";
+
+    // 카테고리 선택 안 했으면 전체 페이지로, 선택했으면 카테고리 페이지로
+    const baseUrl = categoryId
+      ? "{% url 'questions:list_by_category' 0 %}".replace("/0/", "/" + categoryId + "/")
+      : "{% url 'questions:list' %}";
+
+    location.href = baseUrl + "?sort=" + encodeURIComponent(sort);
+  }
+
+  document.getElementById("categorySelect").addEventListener("change", goWithFilters);
+  document.getElementById("sortSelect").addEventListener("change", goWithFilters);
+</script>
+
 
 {% if questions %}
     {% for question in questions %}
