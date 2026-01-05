@@ -8,6 +8,7 @@ venv/
 db.sqlite3
 .env
 *.log
+media/
 
 # OS
 .DS_Store
