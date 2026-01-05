@@ -11,4 +11,9 @@ urlpatterns = [
     path('<int:pk>/answer/', views.answer_create, name='answer_create'),
     path('<int:pk>/resolve/', views.question_resolve, name='resolve'),
     path('staff/', views.staff_unanswered, name='staff_unanswered'),
+    path('my/',views.my_questions, name="my_questions"),
+    path('scrapped/',views.my_scrapped_questions, name="my_scrapped_questions"),
+    path("<int:pk>/scrap/", views.toggle_scrap, name="toggle_scrap"),
+    path("mypage/mine/", views.my_questions, name="my_questions"),
+    path("mypage/scraps/", views.my_scrapped_questions, name="my_scrapped_questions"),
 ]

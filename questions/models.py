@@ -39,6 +39,9 @@ class Question(models.Model):
     # [이서현 의존성] 찜하기 기능 (Many-to-Many)
     scraps = models.ManyToManyField(User, related_name="scrapped_questions", blank=True)
 
+    is_faq = models.BooleanField(default=False)
+    faq_order = models.PositiveIntegerField(default=0)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -72,3 +75,4 @@ class Answer(models.Model):
 
 
 # TODO: [이서현] FAQ 모델 및 API 구현 (자주 묻는 질문, 꿀팁 등)
+    
