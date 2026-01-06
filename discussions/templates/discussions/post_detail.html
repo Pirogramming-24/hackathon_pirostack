@@ -8,7 +8,7 @@
 <div class="mb-6">
     <div class="flex items-start gap-3 mb-3">
         <h1 class="text-3xl font-bold flex-1">{{ post.title }}</h1>
-        {% if user.is_authenticated and post.author == user %}
+        {% if current_profile and post.author == current_profile %}
             <div class="flex gap-2">
                 <a href="{% url 'discussions:post_edit' post.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
             </div>
@@ -90,7 +90,7 @@
             </div>
         </div>
 
-        {% if user.is_authenticated and comment.author == user %}
+        {% if current_profile and comment.author == current_profile %}
         <a href="{% url 'discussions:comment_edit' comment.id %}">수정</a>
 
         <form method="post"
