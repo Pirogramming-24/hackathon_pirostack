@@ -8,9 +8,15 @@
 <div class="mb-6">
     <div class="flex items-start gap-3 mb-3">
         <h1 class="text-3xl font-bold flex-1">{{ post.title }}</h1>
-        <div class="flex gap-2">
-            <a href="{% url 'discussions:post_edit' post.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
-        </div>
+        {% if user.is_authenticated and post.author == user %}
+            <div class="flex gap-2">
+                <a href="{% url 'discussions:post_edit' post.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            </div>
+            <form method="post" action="{% url 'discussions:post_delete' post.id %}">
+            {% csrf_token %}
+            <button type="submit">삭제</button>
+            </form>
+        {% endif %}
     </div>
 
     <div class="flex items-center gap-3 text-sm text-gray-600">
@@ -83,51 +89,8 @@
                 {{ comment.content|linebreaks }}
             </div>
         </div>
-    </div>
-    {% endfor %}
-{% endif %}
 
-<!-- 로그인 연동 후 -->
- {% comment %}
- 로그인 연동 후 작성자만 수정/삭제 가능
-{% if user.is_authenticated and post.author == user %}
-    <a href="{% url 'discussions:post_edit' post.id %}">수정</a>
-
-    <form method="post" action="{% url 'discussions:post_delete' post.id %}">
-        {% csrf_token %}
-        <button type="submit">삭제</button>
-    </form>
-{% endif %}
-{% endcomment %}
-
-<!-- 임시 -->
-<a href="{% url 'discussions:post_edit' post.id %}">수정</a>
-<form method="post" action="{% url 'discussions:post_delete' post.id %}">
-    {% csrf_token %}
-    <button type="submit">삭제</button>
-</form>
-
-<p>
-    <a href="{% url 'discussions:post_list' %}">←목록으로</a>
-</p>
-
-
-<!-- 댓글 부분 -->
-<h3>댓글</h3>
-
-{% for comment in comments %}
-    <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ddd;">
-        <strong>{{ comment.author }}</strong>
-        <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small>
-
-        <p>{{ comment.content }}</p>
-
-        {% comment %}
-        로그인 연동 후 작성자만 댓글 수정/삭제 가능
         {% if user.is_authenticated and comment.author == user %}
-        {% endcomment %}
-
-        <!-- 임시 -->
         <a href="{% url 'discussions:comment_edit' comment.id %}">수정</a>
 
         <form method="post"
@@ -136,19 +99,21 @@
             {% csrf_token %}
             <button type="submit">삭제</button>
         </form>
-
-        {% comment %}
         {% endif %}
-        {% endcomment %}
     </div>
-    <form method="post" action="{% url 'discussions:comment_create' post.id %}">
+    {% endfor %}
+{% endif %}
+
+
+<!-- 댓글 등록 폼 -->
+<form method="post" action="{% url 'discussions:comment_create' post.id %}">
         {% csrf_token %}
         <textarea name="content" rows="6" required class="w-full p-4 border-0 focus:ring-0 outline-none resize-none" placeholder="Leave a comment"></textarea>
         <div class="bg-gray-50 px-4 py-3 border-t border-gray-300 flex justify-end items-center">
             <button type="submit" class="px-4 py-2 bg-[#059212] text-white rounded-md hover:bg-[#06D001] transition-colors font-medium">Comment</button>
         </div>
-    </form>
-</div>
+</form>
+
 
 <div class="mt-6">
     <a href="{% url 'discussions:post_list' %}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">

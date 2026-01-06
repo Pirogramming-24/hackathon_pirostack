@@ -22,7 +22,7 @@
 </head>
 <body class="bg-white text-black" style="font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif; line-height: 1.4; letter-spacing: -0.025em;">
     <nav class="fixed top-0 left-0 right-0 z-50 bg-[#059212] px-8 py-6 shadow-lg">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
             <a href="{% url 'questions:list' %}" class="text-white text-2xl font-semibold tracking-tight">PiroStack</a>
 
             {% if request.session.name %}
@@ -63,6 +63,23 @@
     <div class="mt-[88px]">
         {% block content %}{% endblock %}
     </div>
+
+    <script>
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // 메뉴 외부 클릭시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('userMenu');
+            const button = event.target.closest('button[onclick="toggleUserMenu()"]');
+
+            if (!button && menu && !menu.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>

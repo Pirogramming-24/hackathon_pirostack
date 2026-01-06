@@ -7,9 +7,7 @@
 
 <form method="post">
     {% csrf_token %}
-    <textarea name="content" rows="4" style="width:100%;" required>
-{{ comment.content }}
-    </textarea>
+    <textarea name="content" rows="4" style="width:100%;" required>{{ comment.content }}</textarea>
     <br>
     <button type="submit">수정 완료</button>
     <a href="{% url 'discussions:post_detail' post_id %}">취소</a>

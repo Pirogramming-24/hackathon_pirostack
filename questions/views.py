@@ -303,6 +303,7 @@ def reply_create(request, pk, answer_pk):
 @staff_required
 def staff_unanswered(request):
     questions = Question.objects.filter(is_resolved=False)
+    categories = Category.objects.all().order_by("name")
 
     # 미답변 질문
     only_unanswered_param = request.GET.get("only_unanswered")
@@ -335,12 +336,21 @@ def staff_unanswered(request):
         .annotate(count=Count("id"))
     )
 
+    session_categories = Category.objects.filter(category_type="session").order_by("name")
+    assignment_categories = Category.objects.filter(category_type="assignment").order_by("name")
+
     return render(request, "questions/staff_unanswered.html", {
     "questions": questions,
     "sort": sort,
     "only_unanswered": only_unanswered,
     "total_unanswered": total_unanswered,
-    "category_stats": category_stats,})
+    "category_stats": category_stats,
+
+    "session_categories": session_categories,
+    "assignment_categories": assignment_categories,
+    "categories": categories,
+    
+    })
 
 
 
