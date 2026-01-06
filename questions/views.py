@@ -1,9 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Question, Category
+from .models import Question, Category, Answer
 from .forms import QuestionForm, AnswerForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Count
+
+
 # Create your views here.
 
 
@@ -244,11 +248,151 @@ def question_delete(request, pk):
     return redirect("questions:detail", pk=pk)
 
 
+def question_scrap(request, pk):
+    """질문 찜하기 토글"""
+    question = get_object_or_404(Question, pk=pk)
+
+    if request.method == "POST":
+        # 익명 사용자도 세션 기반으로 처리 가능하도록
+        # TODO: 로그인 구현되면 request.user 사용
+        # 현재는 간단히 전체 카운트만 증가/감소
+
+        # 임시: 세션 기반 찜하기
+        scrapped = request.session.get(f'scrapped_{pk}', False)
+        request.session[f'scrapped_{pk}'] = not scrapped
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({
+                "scrapped": not scrapped,
+                "scrap_count": question.scraps.count()
+            })
+
+        return redirect("questions:detail", pk=pk)
+
+    return redirect("questions:detail", pk=pk)
+
+
+def reply_create(request, pk, answer_pk):
+    """꼬리질문(답변에 대한 대댓글) 작성"""
+    question = get_object_or_404(Question, pk=pk)
+    parent_answer = get_object_or_404(Answer, pk=answer_pk)
+
+    if request.method == "POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.question = question
+            reply.parent = parent_answer
+            reply.author = None
+            reply.is_anonymous = True
+            reply.is_staff = False
+            reply.save()
+
+    return redirect("questions:detail", pk=pk)
+
+
+
+
+
+
+"""
+[김서윤] 운영진 대시보드
+"""
+# def staff_required(user):
+#     return user.is_authenticated and user.is_staff
+
+# @user_passes_test(staff_required, login_url="/")
+
+
 def staff_unanswered(request):
-    """
-    [김서윤] 운영진 대시보드
-    TODO: 미답변 질문 리스트 필터링 및 통계 기능 구현
-    """
-    # 에러 방지를 위한 기본 구현 (미해결 질문만 표시)
     questions = Question.objects.filter(is_resolved=False)
-    return render(request, "questions/staff_unanswered.html", {"questions": questions})
+
+    # 미답변 질문
+    only_unanswered_param = request.GET.get("only_unanswered")
+    if only_unanswered_param == "1":
+        only_unanswered = "1"
+    else:
+        only_unanswered = "0"
+    questions = Question.objects.all()
+    if only_unanswered == "1":
+        questions = questions.filter(is_resolved=False)
+
+
+    # 필터링
+    sort = request.GET.get("sort", "latest")
+    if sort == "latest":
+        questions = questions.order_by("-created_at")
+    elif sort == "oldest":
+        questions = questions.order_by("created_at")
+
+    # 카테고리 필터
+    category_id = request.GET.get("category")
+    if category_id:
+        questions = questions.filter(category_id=category_id)
+
+    # 통계
+    total_unanswered = Question.objects.filter(is_resolved=False).count() # 전체
+    category_stats = ( # 카테고리별 미답변 개수
+        Question.objects.filter(is_resolved=False)
+        .values("category__name")
+        .annotate(count=Count("id"))
+    )
+
+    return render(request, "questions/staff_unanswered.html", {
+    "questions": questions,
+    "sort": sort,
+    "only_unanswered": only_unanswered,
+    "total_unanswered": total_unanswered,
+    "category_stats": category_stats,})
+
+
+
+def category_list(request):
+    """카테고리 리스트"""
+    sort = request.GET.get("sort", "latest")  # latest = 세션, oldest = 과제
+    if sort == "latest":
+        categories = Category.objects.filter(category_type="session").order_by("-created_at")
+    else:
+        categories = Category.objects.filter(category_type="assignment").order_by("-created_at")
+
+    return render(request, "questions/category_list.html", {
+        "categories": categories,
+        "sort": sort,
+    })
+
+
+def category_create(request):
+    """카테고리 생성"""
+    if request.method == "POST":
+        name = request.POST.get("name")
+        category_type = request.POST.get("category_type", "session")
+        if name:
+            Category.objects.create(name=name, category_type=category_type)
+            return redirect("questions:category_list")
+
+    return render(request, "questions/category_form.html", {"action": "add"})
+
+
+def category_update(request, pk):
+    """카테고리 수정"""
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == "POST":
+        name = request.POST.get("name")
+        category_type = request.POST.get("category_type")
+        if name:
+            category.name = name
+            category.category_type = category_type
+            category.save()
+            return redirect("questions:category_list")
+
+    return render(request, "questions/category_form.html", {"category": category, "action": "edit"})
+
+
+def category_delete(request, pk):
+    """카테고리 삭제"""
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == "POST":
+        category.delete()
+        return redirect("questions:category_list")
+
+    return render(request, "questions/category_confirm_delete.html", {"category": category})
