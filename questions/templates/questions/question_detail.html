@@ -33,7 +33,7 @@
             {% endif %}
         </span>
         <span class="font-medium">{% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %}</span>
-        <span>opened this question {{ question.created_at|timesince }} ago</span>
+        <span>{{ question.created_at|date:"Y.m.d H:i" }}</span>
         <span>·</span>
         <span class="inline-flex items-center gap-1">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
@@ -52,7 +52,7 @@
                 {% if question.is_anonymous %}?{% else %}{{ question.author.username|slice:":1"|upper }}{% endif %}
             </div>
             <span class="font-semibold">{% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %}</span>
-            <span class="text-gray-500">commented {{ question.created_at|timesince }} ago</span>
+            <span class="text-gray-500">{{ question.created_at|date:"Y.m.d H:i" }}</span>
         </div>
         <span class="text-xs bg-gray-200 px-2 py-0.5 rounded">{{ question.category.name }}</span>
     </div>
@@ -65,8 +65,8 @@
         <div class="flex gap-2 mt-4 pt-4 border-t border-gray-200">
             <form method="post" action="{% url 'questions:toggle_scrap' question.pk %}" style="display: inline;">
                 {% csrf_token %}
-                {% if user.is_authenticated %}
-                    {% if user in question.scraps.all %}
+                {% if current_profile %}
+                    {% if current_profile in question.scraps.all %}
                         <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-yellow-400 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors">
                             ★ 찜 해제 <span class="text-yellow-600">({{ question.scraps.count }})</span>
                         </button>
@@ -76,8 +76,8 @@
                         </button>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'login' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                        ☆ 찜하기 (로그인 필요)
+                    <a href="{% url 'users:login' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                        ☆ 찜하기
                     </a>
                 {% endif %}
             </form>
@@ -119,7 +119,7 @@
                     {% if answer.is_staff %}
                         <span class="px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full font-medium">운영진</span>
                     {% endif %}
-                    <span class="text-gray-500">commented {{ answer.created_at|timesince }} ago</span>
+                    <span class="text-gray-500">{{ answer.created_at|date:"Y.m.d H:i" }}</span>
                 </div>
             </div>
 
@@ -142,7 +142,7 @@
                                 <span class="text-sm font-semibold text-gray-700">
                                     {% if reply.is_anonymous %}익명{% else %}{{ reply.author.username }}{% endif %}
                                 </span>
-                                <span class="text-xs text-gray-500">{{ reply.created_at|timesince }} ago</span>
+                                <span class="text-xs text-gray-500">{{ reply.created_at|date:"Y.m.d H:i" }}</span>
                             </div>
                             <div class="text-sm text-gray-800 leading-relaxed">
                                 {{ reply.content|linebreaks }}
@@ -191,7 +191,7 @@
 </div>
 
 <div class="mt-6">
-    {% if request.GET.from == 'staff' %}
+    {% if request.session.is_staff %}
         <a href="{% url 'questions:staff_unanswered' %}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M7.78 12.53a.75.75 0 0 1-1.06 0L2.47 8.28a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L4.81 7h7.44a.75.75 0 0 1 0 1.5H4.81l2.97 2.97a.75.75 0 0 1 0 1.06z"/>

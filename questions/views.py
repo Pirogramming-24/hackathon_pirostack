@@ -3,10 +3,9 @@ from django.http import JsonResponse
 from .models import Question, Category, Answer
 from .forms import QuestionForm, AnswerForm
 from django.db.models import Q
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count
 from users.decorators import staff_required
+from users.models import Profile
 
 
 # Create your views here.
@@ -91,20 +90,25 @@ def question_list_by_category(request, category_id):
     #질문 리스트 페이지 렌더링
     return render(request, "questions/question_list.html", context)
 
-@login_required
 def my_questions(request):
-    #내가 작성한 질문 리스트
-    questions = Question.objects.filter(author=request.user)
+    # 로그인 확인 (세션 기반)
+    profile_id = request.session.get("profile_id")
+    if not profile_id:
+        return redirect("users:login")
+
+    # 내가 작성한 질문 리스트
+    profile = get_object_or_404(Profile, pk=profile_id)
+    questions = Question.objects.filter(author=profile)
     faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
 
-    #정렬
-    sort_param=request.GET.get("sort","latest")
+    # 정렬
+    sort_param = request.GET.get("sort", "latest")
     if sort_param == "oldest":
         questions = questions.order_by("created_at", "id")
     else:
         questions = questions.order_by("-created_at", "-id")
 
-    #카테고리 드롭다운
+    # 카테고리 드롭다운
     categories = Category.objects.all().order_by("id")
 
     context = {
@@ -118,11 +122,15 @@ def my_questions(request):
     return render(request, "questions/question_list.html", context)
 
 
-@login_required
 def my_scrapped_questions(request):
-   
-    #  내가 찜한 질문들 가져오기 
-    questions = Question.objects.filter(scraps=request.user)
+    # 로그인 확인 (세션 기반)
+    profile_id = request.session.get("profile_id")
+    if not profile_id:
+        return redirect("users:login")
+
+    # 내가 찜한 질문들 가져오기
+    profile = get_object_or_404(Profile, pk=profile_id)
+    questions = Question.objects.filter(scraps=profile)
     faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
 
     # 정렬 (기본 최신순)
@@ -141,24 +149,28 @@ def my_scrapped_questions(request):
         "selected_sort": sort_param,
         "page_title": "내가 찜한 질문",
         "faq_questions": faq_questions,
-        
     }
     return render(request, "questions/question_list.html", context)
 
-#찜기능 구현
-@login_required
+# 찜기능 구현
 def toggle_scrap(request, pk):
-
     if request.method != "POST":
         return redirect("questions:detail", pk=pk)
 
+    # 로그인 확인 (세션 기반)
+    profile_id = request.session.get("profile_id")
+    if not profile_id:
+        # 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+        return redirect("users:login")
+
     question = get_object_or_404(Question, pk=pk)
+    profile = get_object_or_404(Profile, pk=profile_id)
 
     # 이미 찜했으면 해제, 아니면 찜
-    if request.user in question.scraps.all():
-        question.scraps.remove(request.user)
+    if profile in question.scraps.all():
+        question.scraps.remove(profile)
     else:
-        question.scraps.add(request.user)
+        question.scraps.add(profile)
 
     # 눌렀던 페이지로 다시 돌아가기 (없으면 상세로)
     return redirect(request.META.get("HTTP_REFERER", "questions:detail"))
@@ -167,10 +179,20 @@ def question_detail(request, pk):
     """질문 상세 페이지"""
     question = get_object_or_404(Question, pk=pk)
     answers = question.answers.all()
+
+    # 현재 로그인한 사용자의 프로필 가져오기
+    current_profile = None
+    profile_id = request.session.get("profile_id")
+    if profile_id:
+        try:
+            current_profile = Profile.objects.get(pk=profile_id)
+        except Profile.DoesNotExist:
+            pass
+
     context = {
         "question": question,
         "answers": answers,
-        "user": request.user,
+        "current_profile": current_profile,
     }
     return render(request, "questions/question_detail.html", context)
 
@@ -349,21 +371,17 @@ def staff_list_by_category(request, category_id):
 
 @staff_required
 def staff_unanswered(request):
-    questions = Question.objects.filter(is_resolved=False)
     categories = Category.objects.all().order_by("name")
 
-    # 미답변 질문
-    only_unanswered_param = request.GET.get("only_unanswered")
-    if only_unanswered_param == "1":
-        only_unanswered = "1"
-    else:
-        only_unanswered = "0"
+    # 이전 질문까지 보기 (디폴트: 미답변만)
+    include_answered = request.GET.get("include_answered", "")
     questions = Question.objects.all()
-    if only_unanswered == "1":
+
+    # include_answered가 1이 아니면 미답변만 필터링 (디폴트 동작)
+    if include_answered != "1":
         questions = questions.filter(is_resolved=False)
 
-
-    # 필터링
+    # 정렬
     sort = request.GET.get("sort", "latest")
     if sort == "latest":
         questions = questions.order_by("-created_at")
@@ -389,14 +407,14 @@ def staff_unanswered(request):
     return render(request, "questions/staff_unanswered.html", {
     "questions": questions,
     "sort": sort,
-    "only_unanswered": only_unanswered,
+    "include_answered": include_answered,
     "total_unanswered": total_unanswered,
     "category_stats": category_stats,
 
     "session_categories": session_categories,
     "assignment_categories": assignment_categories,
     "categories": categories,
-    
+
     })
 
 
