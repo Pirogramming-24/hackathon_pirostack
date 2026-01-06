@@ -33,7 +33,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 # Render 배포 시 HTTPS 관련 보안 설정
 CSRF_TRUSTED_ORIGINS = os.environ.get(
-    "CSRF_TRUSTED_ORIGINS", "https://*.render.com"
+    "CSRF_TRUSTED_ORIGINS", "https://*.onrender.com,https://*.render.com"
 ).split(",")
 
 # Application definition
