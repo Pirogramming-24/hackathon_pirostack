@@ -58,6 +58,32 @@
                 로그인 폼으로 되돌아가기
             </a>
         </div>
+        {% if messages %}
+            <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4">
+                {% for message in messages %}
+                <div class="mb-4 p-4 rounded-xl shadow-lg flex items-center justify-between transition-all duration-500
+                    {% if message.tags == 'success' %}
+                        bg-[#059212] text-white
+                    {% elif message.tags == 'error' %}
+                        bg-red-50 border-red-500 text-red-600
+                    {% else %}
+                        bg-blue-50 border-blue-500 text-blue-600
+                    {% endif %}">
+                    
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-bold">{{ message }}</span>
+                    </div>
+
+                    <button onclick="this.parentElement.remove()" class="ml-4 opacity-50 hover:opacity-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 
 </body>
