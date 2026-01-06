@@ -87,59 +87,10 @@
     {% endfor %}
 {% endif %}
 
-<!-- 로그인 연동 후 -->
- {% comment %}
- 로그인 연동 후 작성자만 수정/삭제 가능
-{% if user.is_authenticated and post.author == user %}
-    <a href="{% url 'discussions:post_edit' post.id %}">수정</a>
-
-    <form method="post" action="{% url 'discussions:post_delete' post.id %}">
-        {% csrf_token %}
-        <button type="submit">삭제</button>
-    </form>
-{% endif %}
-{% endcomment %}
-
-<!-- 임시 -->
-<a href="{% url 'discussions:post_edit' post.id %}">수정</a>
-<form method="post" action="{% url 'discussions:post_delete' post.id %}">
-    {% csrf_token %}
-    <button type="submit">삭제</button>
-</form>
-
-<p>
-    <a href="{% url 'discussions:post_list' %}">←목록으로</a>
-</p>
-
-
-<!-- 댓글 부분 -->
-<hr>
-
-<h3>댓글</h3>
-
-{% for comment in comments %}
-    <div style="margin-bottom: 10px;">
-        <strong>{{ comment.author }}</strong>
-        <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small>
-        <p>{{ comment.content }}</p>
-
-
-        <!-- 임시 -->
-        {% comment %}
-        로그인 연동 후 작성자만 댓글 삭제 가능
-        {% if user.is_authenticated and comment.author == user %}
-        {% endcomment %}
-        
-        <form method="post" action="{% url 'discussions:comment_delete' comment.id %}"
-              style="display:inline;">
-            {% csrf_token %}
-            <button type="submit">삭제</button>
-        </form>
-
-        {% comment %}
-        {% endif %}
-        {% endcomment %}
-
+<!-- 댓글 작성 폼 -->
+<div class="border border-gray-300 rounded-lg">
+    <div class="bg-gray-50 px-4 py-2 border-b border-gray-300">
+        <span class="text-sm font-semibold text-gray-700">Add a comment</span>
     </div>
     <form method="post" action="{% url 'discussions:comment_create' post.id %}">
         {% csrf_token %}
