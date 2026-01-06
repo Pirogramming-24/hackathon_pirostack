@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.db.models import Count
 from users.decorators import staff_required
 from users.models import Profile 
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
