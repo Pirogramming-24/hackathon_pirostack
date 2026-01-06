@@ -14,9 +14,9 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "*"
+        value: "pirostack-web.onrender.com"
     # 실행 시 마이그레이션과 정적 파일 수집을 먼저 수행합니다.
-    dockerCommand: sh -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:8000 hackathon.wsgi:application"
+    dockerCommand: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:8000 hackathon.wsgi:application"
 
 databases:
   - name: pirostack-db
