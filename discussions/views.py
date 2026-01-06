@@ -3,19 +3,24 @@ from .models import DiscussionPost, DiscussionComment
 from django.http import HttpResponseForbidden
 from django.db.models import Q
 from users.models import Profile
-from django.urls import reverse
 
 
 # Create your views here.
 def get_current_profile(request):
     """세션에서 현재 프로필을 가져오는 헬퍼 함수"""
-    profile_id = request.session.get("profile_id")
-    if profile_id:
-        try:
-            return Profile.objects.get(pk=profile_id)
-        except Profile.DoesNotExist:
-            pass
-    return None
+    # 미들웨어에서 추가한 프로필 객체가 있으면 우선 사용
+    if getattr(request, "user_profile", None):
+        return request.user_profile
+
+    # 기존 세션 키(profile_id)와 현재 세션 키(user_id)를 모두 확인
+    profile_id = request.session.get("user_id") or request.session.get("profile_id")
+    if not profile_id:
+        return None
+
+    try:
+        return Profile.objects.get(pk=profile_id)
+    except Profile.DoesNotExist:
+        return None
 
 
 def post_list(request):
@@ -58,8 +63,7 @@ def post_detail(request, post_id):
 def post_create(request):
     profile = get_current_profile(request)
     if not profile:
-        login_url = reverse("users:login")
-        return redirect(f"{login_url}?next={request.path}")
+        return redirect("users:login")
 
     if request.method == "POST":
         title = request.POST.get("title")

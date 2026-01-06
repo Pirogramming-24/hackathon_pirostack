@@ -18,15 +18,9 @@
             {% endif %}
 
             <!-- 새 글 작성 버튼 -->
-            {% if current_profile %}
             <a href="{% url 'discussions:post_create' %}" class="block w-full mb-6 px-4 py-2 bg-[#059212] text-white text-center rounded-lg hover:bg-[#06D001] transition-colors font-medium">
                 + 새 글 작성
             </a>
-            {% else %}
-            <a href="{% url 'users:login' %}?next={% url 'discussions:post_create' %}" class="block w-full mb-6 px-4 py-2 bg-[#059212] text-white text-center rounded-lg hover:bg-[#06D001] transition-colors font-medium">
-                + 새 글 작성
-            </a>
-            {% endif %}
 
 
             <!-- 질문 게시판 링크 -->
@@ -83,10 +77,10 @@
                     </h3>
                 </div>
                 <p class="text-sm text-gray-600 mb-3 line-clamp-2">
-                    {{ post.content|truncatechars:100 }}
+                    {{ post.content|truncatechars:100|linebreaksbr }}
                 </p>
                 <div class="flex items-center gap-4 text-sm text-gray-500">
-                    <span class="font-medium">{{ post.author.username }}</span>
+                    <span class="font-medium">익명</span>
                     <span>·</span>
                     <span>{{ post.created_at|date:"Y.m.d H:i" }}</span>
                     <span>·</span>

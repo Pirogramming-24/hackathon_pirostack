@@ -11,16 +11,17 @@
         {% if current_profile and post.author == current_profile %}
             <div class="flex gap-2">
                 <a href="{% url 'discussions:post_edit' post.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            
+                <form method="post" action="{% url 'discussions:post_delete' post.id %}">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors">삭제</button>
+                </form>
             </div>
-            <form method="post" action="{% url 'discussions:post_delete' post.id %}">
-            {% csrf_token %}
-            <button type="submit">삭제</button>
-            </form>
         {% endif %}
     </div>
 
     <div class="flex items-center gap-3 text-sm text-gray-600">
-        <span class="font-medium">{{ post.author.username }}</span>
+        <span class="font-medium">익명</span>
         <span>{{ post.created_at|date:"Y.m.d H:i" }}</span>
         <span>·</span>
         <span class="inline-flex items-center gap-1">
@@ -37,15 +38,15 @@
     <div class="bg-gray-50 px-4 py-2 border-b border-gray-300 flex items-center justify-between">
         <div class="flex items-center gap-2 text-sm text-gray-700">
             <div class="w-6 h-6 rounded-full bg-[#059212] flex items-center justify-center text-white font-bold text-xs">
-                {{ post.author.username|slice:":1"|upper }}
+                {% if post.author %}{{ post.author.name|slice:":1"|upper }}{% else %}?{% endif %}
             </div>
-            <span class="font-semibold">{{ post.author.username }}</span>
+            <span class="font-semibold">{% if post.author %}{{ post.author.name }}{% else %}익명{% endif %}</span>
             <span class="text-gray-500">{{ post.created_at|date:"Y.m.d H:i" }}</span>
         </div>
     </div>
 
     <div class="p-5 bg-white">
-        <div class="prose max-w-none text-gray-800 leading-relaxed mb-4">
+        <div class="prose max-w-none text-gray-800 leading-relaxed">
             {{ post.content|linebreaks }}
         </div>
 
@@ -76,9 +77,9 @@
         <div class="bg-gray-50 px-4 py-2 border-b border-gray-300 flex items-center justify-between">
             <div class="flex items-center gap-2 text-sm">
                 <div class="w-6 h-6 rounded-full bg-gray-500 flex items-center justify-center text-white font-bold text-xs">
-                    {{ comment.author.username|slice:":1"|upper }}
+                    {% if comment.author %}{{ comment.author.name|slice:":1"|upper }}{% else %}?{% endif %}
                 </div>
-                <span class="font-semibold text-gray-700">{{ comment.author.username }}</span>
+                <span class="font-semibold text-gray-700">{% if comment.author %}{{ comment.author.name }}{% else %}익명{% endif %}</span>
                 <span class="text-gray-500">{{ comment.created_at|date:"Y.m.d H:i" }}</span>
             </div>
         </div>
@@ -90,22 +91,23 @@
             </div>
         </div>
 
-        {% if current_profile and comment.author == current_profile %}
-        <a href="{% url 'discussions:comment_edit' comment.id %}">수정</a>
-
-        <form method="post"
-              action="{% url 'discussions:comment_delete' comment.id %}"
-              style="display:inline;">
-            {% csrf_token %}
-            <button type="submit">삭제</button>
-        </form>
+        {% if user.is_authenticated and comment.author == user %}
+            <div class="bg-gray-50 px-5 py-3 border-t border-gray-200 flex gap-2">
+                <a href="{% url 'discussions:comment_edit' comment.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            
+                <form method="post" action="{% url 'discussions:comment_delete' comment.id %}">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors">삭제</button>
+                </form>
+            </div>
         {% endif %}
+
     </div>
     {% endfor %}
 {% endif %}
 
 
-<!-- 댓글 등록 폼 -->
+<!-- 댓글 등록 -->
 <form method="post" action="{% url 'discussions:comment_create' post.id %}">
         {% csrf_token %}
         <textarea name="content" rows="6" required class="w-full p-4 border-0 focus:ring-0 outline-none resize-none" placeholder="Leave a comment"></textarea>
@@ -114,7 +116,7 @@
         </div>
 </form>
 
-
+<!-- 목록 이동 -->
 <div class="mt-6">
     <a href="{% url 'discussions:post_list' %}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">

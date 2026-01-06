@@ -139,11 +139,17 @@ def my_questions(request):
 
 
 def my_scrapped_questions(request):
-   
-    #  내가 찜한 질문들 가져오기 
-    profile = get_object_or_404(Profile, phone_number=request.user.username)
+
+    #  내가 찜한 질문들 가져오기
+    profile_id = request.session.get("profile_id")
+    if not profile_id:
+        return redirect("users:login")
+
+    profile = get_object_or_404(Profile, pk=profile_id)
     questions = Question.objects.filter(scraps=profile)
-    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
+    faq_questions = Question.objects.filter(is_faq=True).order_by(
+        "faq_order", "-created_at"
+    )[:5]
 
     # 정렬 (기본 최신순)
     sort_param = request.GET.get("sort", "latest")
@@ -165,8 +171,8 @@ def my_scrapped_questions(request):
     }
     return render(request, "questions/question_list.html", context)
 
-#찜기능 구현
-@login_required
+
+# 찜기능 구현
 def toggle_scrap(request, pk):
     print("DEBUG session profile_id:", request.session.get("profile_id"))
     print("DEBUG django auth:", request.user.is_authenticated, request.user)
@@ -188,9 +194,6 @@ def toggle_scrap(request, pk):
 
     profile = get_object_or_404(Profile, pk=profile_id)
 
-    # ✅ User -> Profile 매핑 (네 프로젝트는 username=phone_number로 쓰고 있었지)
-    profile = get_object_or_404(Profile, phone_number=request.user.username)
-
     if question.scraps.filter(pk=profile.pk).exists():
         question.scraps.remove(profile)
     else:
@@ -202,14 +205,14 @@ def toggle_scrap(request, pk):
     return redirect("questions:detail", pk=pk)
 
 
-
 def question_detail(request, pk):
     """질문 상세 페이지"""
     question = get_object_or_404(Question, pk=pk)
     answers = question.answers.all()
     profile = None
-    if request.user.is_authenticated:
-        profile = Profile.objects.filter(phone_number=request.user.username).first()
+    profile_id = request.session.get("profile_id")
+    if profile_id:
+        profile = Profile.objects.filter(pk=profile_id).first()
     context = {
         "is_staff": request.is_staff,  # 운영진 여부 전달
         "question": question,
@@ -344,6 +347,18 @@ def question_scrap(request, pk):
 
         return redirect("questions:detail", pk=pk)
 
+    return redirect("questions:detail", pk=pk)
+
+
+@staff_required
+def question_faq(request, pk):
+    """질문 FAQ 등록/해제 토글"""
+    question = get_object_or_404(Question, pk=pk)
+
+    if request.method == "POST":
+        question.is_faq = not question.is_faq
+        question.save()
+        return redirect("questions:detail", pk=pk)
     return redirect("questions:detail", pk=pk)
 
 
