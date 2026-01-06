@@ -97,3 +97,21 @@ def comment_delete(request,comment_id):
     if request.method == 'POST':
         comment.delete()
     return redirect('discussions:post_detail',post_id=post_id)
+
+# @login_required
+def comment_edit(request,comment_id):
+    comment = get_object_or_404(DiscussionComment,id=comment_id)
+    post_id = comment.post.id
+
+    # if comment.author != User.objects.first():
+    #    return HttpResponseForbidden("수정 권한이 없습니다.")
+
+    if request.method == 'POST':
+        comment.content = request.POST.get('content')
+        comment.save()
+        return redirect('discussions:post_detail', post_id=post_id)
+
+    return render(request, 'discussions/comment_form.html', {
+        'comment': comment,
+        'post_id': post_id
+    })
