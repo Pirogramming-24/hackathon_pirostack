@@ -5,7 +5,8 @@ from .forms import QuestionForm, AnswerForm
 from django.db.models import Q
 from django.db.models import Count
 from users.decorators import staff_required
-from users.models import Profile
+from users.models import Profile 
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -173,16 +174,24 @@ def my_scrapped_questions(request):
 
 # 찜기능 구현
 def toggle_scrap(request, pk):
+    print("DEBUG session profile_id:", request.session.get("profile_id"))
+    print("DEBUG django auth:", request.user.is_authenticated, request.user)
     if request.method != "POST":
         return redirect("questions:detail", pk=pk)
 
-    # 로그인 확인 (세션 기반)
-    profile_id = request.session.get("profile_id")
-    if not profile_id:
-        # 로그인하지 않은 경우 로그인 페이지로 리다이렉트
-        return redirect("users:login")
-
     question = get_object_or_404(Question, pk=pk)
+
+    # Django 로그인 기반으로 Profile 매핑 (username = phone_number)
+    profile = get_object_or_404(Profile, phone_number=request.user.username)
+
+    if question.scraps.filter(pk=profile.pk).exists():
+        question.scraps.remove(profile)
+    else:
+        question.scraps.add(profile)
+
+    ref = request.META.get("HTTP_REFERER")
+    return redirect(ref) if ref else redirect("questions:detail", pk=pk)
+
     profile = get_object_or_404(Profile, pk=profile_id)
 
     if question.scraps.filter(pk=profile.pk).exists():

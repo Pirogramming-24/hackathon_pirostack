@@ -4,7 +4,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from .models import Profile
 import os
 from dotenv import load_dotenv
-
 # Create your views here.
 
 

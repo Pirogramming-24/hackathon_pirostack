@@ -54,9 +54,25 @@
                 </svg>
                 <span>커뮤니티</span>
             </a>
-
+            <form method="get" class="flex items-center gap-2">
+            
             <!-- 세션 카테고리 -->
             <div class="mb-4">
+                <!--오래된순/최신순 정렬필터-->
+            {% if q %}
+            <input type="hidden" name="q" value="{{ q }}">
+            {% endif %}
+
+            <label for="sort" class="text-sm text-gray-600">정렬</label>
+
+            <select id="sort" name="sort"
+                onchange="this.form.submit()"
+                class="h-9 px-3 pr-8 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="latest" {% if selected_sort == "latest" %}selected{% endif %}>최신순</option>
+                <option value="oldest" {% if selected_sort == "oldest" %}selected{% endif %}>오래된순</option>
+            </select>
+            </form>
+
                 <details open class="group">
                     <summary class="flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-gray-50 rounded-md font-medium text-gray-700">
                         <span class="flex items-center gap-2">
