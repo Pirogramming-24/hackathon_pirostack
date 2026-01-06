@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.SessionUserMiddleware',  # 세션 기반 사용자 인증
 ]
 
 ROOT_URLCONF = 'hackathon.urls'

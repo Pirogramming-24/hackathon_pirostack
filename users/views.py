@@ -69,6 +69,11 @@ def login(request):
             return redirect('users:loginPass',pk=profile.id)
 
         if profile.permission:
+            # 일반 사용자 세션 저장
+            request.session['user_id'] = profile.id
+            request.session['is_staff'] = False
+            request.session['phone_number'] = profile.phone_number
+            request.session['name'] = profile.name
             return redirect('questions:list')
     return render(request,'login.html')
 
@@ -80,7 +85,16 @@ def loginPass(request,pk):
     if request.method == 'POST':
         print(request.POST.get('password'))
         if profile.password == request.POST.get('password'):
-            return redirect('questions:list')
+            # 세션에 사용자 정보 저장
+            request.session['user_id'] = profile.id
+            request.session['is_staff'] = profile.is_staff
+            request.session['phone_number'] = profile.phone_number
+            request.session['name'] = profile.name
+            # 운영진은 staff 대시보드로 이동
+            if profile.is_staff:
+                return redirect('questions:staff_unanswered')
+            else:
+                return redirect('questions:list')
     return render(request,'password_form.html',context)
 
 def superadmin(request):
@@ -95,3 +109,8 @@ def superadmin(request):
         'people':people
     }
     return render(request,'superadmin.html',context)
+
+def logout_view(request):
+    """로그아웃 - 세션 정보 삭제"""
+    request.session.flush()
+    return redirect('users:login')
