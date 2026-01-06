@@ -22,14 +22,48 @@
 </head>
 <body class="bg-white text-black" style="font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif; line-height: 1.4; letter-spacing: -0.025em;">
     <nav class="fixed top-0 left-0 right-0 z-50 bg-[#059212] px-8 py-6 shadow-lg">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
             <a href="{% url 'questions:list' %}" class="text-white text-2xl font-semibold tracking-tight">PiroStack</a>
+
+            {% if request.session.name %}
+            <div class="relative">
+                <button onclick="toggleUserMenu()" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <span class="text-white text-sm font-medium">{{ request.session.name }}</span>
+                    <span class="px-2.5 py-1 bg-white/20 text-white text-xs font-semibold rounded-full">
+                        {% if request.session.is_staff %}운영진{% else %}부원{% endif %}
+                    </span>
+                </button>
+
+                <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                    <a href="{% url 'users:logout' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        로그아웃
+                    </a>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </nav>
 
     <div class="mt-[88px]">
         {% block content %}{% endblock %}
     </div>
+
+    <script>
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // 메뉴 외부 클릭시 닫기
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('userMenu');
+            const button = event.target.closest('button[onclick="toggleUserMenu()"]');
+
+            if (!button && menu && !menu.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>
