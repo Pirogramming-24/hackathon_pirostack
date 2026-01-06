@@ -5,8 +5,7 @@ from .forms import QuestionForm, AnswerForm
 from django.db.models import Q
 from django.db.models import Count
 from users.decorators import staff_required
-from users.models import Profile
-
+from users.models import Profile 
 
 # Create your views here.
 
@@ -139,17 +138,11 @@ def my_questions(request):
 
 
 def my_scrapped_questions(request):
-    # 로그인 확인 (세션 기반)
-    profile_id = request.session.get("profile_id")
-    if not profile_id:
-        return redirect("users:login")
-
-    # 내가 찜한 질문들 가져오기
-    profile = get_object_or_404(Profile, pk=profile_id)
+   
+    #  내가 찜한 질문들 가져오기 
+    profile = get_object_or_404(Profile, phone_number=request.user.username)
     questions = Question.objects.filter(scraps=profile)
-    faq_questions = Question.objects.filter(is_faq=True).order_by(
-        "faq_order", "-created_at"
-    )[:5]
+    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
 
     # 정렬 (기본 최신순)
     sort_param = request.GET.get("sort", "latest")
@@ -171,8 +164,8 @@ def my_scrapped_questions(request):
     }
     return render(request, "questions/question_list.html", context)
 
-
-# 찜기능 구현
+#찜기능 구현
+@login_required
 def toggle_scrap(request, pk):
     if request.method != "POST":
         return redirect("questions:detail", pk=pk)
@@ -186,35 +179,33 @@ def toggle_scrap(request, pk):
     question = get_object_or_404(Question, pk=pk)
     profile = get_object_or_404(Profile, pk=profile_id)
 
-    # 이미 찜했으면 해제, 아니면 찜
-    if profile in question.scraps.all():
+    # ✅ User -> Profile 매핑 (네 프로젝트는 username=phone_number로 쓰고 있었지)
+    profile = get_object_or_404(Profile, phone_number=request.user.username)
+
+    if question.scraps.filter(pk=profile.pk).exists():
         question.scraps.remove(profile)
     else:
         question.scraps.add(profile)
 
-    # 눌렀던 페이지로 다시 돌아가기 (없으면 상세로)
-    return redirect(request.META.get("HTTP_REFERER", "questions:detail"))
+    ref = request.META.get("HTTP_REFERER")
+    if ref:
+        return redirect(ref)
+    return redirect("questions:detail", pk=pk)
+
 
 
 def question_detail(request, pk):
     """질문 상세 페이지"""
     question = get_object_or_404(Question, pk=pk)
     answers = question.answers.all()
-
-    # 현재 로그인한 사용자의 프로필 가져오기
-    current_profile = None
-    profile_id = request.session.get("profile_id")
-    if profile_id:
-        try:
-            current_profile = Profile.objects.get(pk=profile_id)
-        except Profile.DoesNotExist:
-            pass
-
+    profile = None
+    if request.user.is_authenticated:
+        profile = Profile.objects.filter(phone_number=request.user.username).first()
     context = {
         "is_staff": request.is_staff,  # 운영진 여부 전달
         "question": question,
         "answers": answers,
-        "current_profile": current_profile,
+        "profile": profile,
     }
     return render(request, "questions/question_detail.html", context)
 

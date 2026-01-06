@@ -36,6 +36,15 @@
                 <img src="{% static 'icons/faq.svg' %}" alt="FAQ" class="w-5 h-5">
                 <span>FAQ</span>
             </a>
+            <!--찜한 목록 보기-->
+            {% if user.is_authenticated %}
+            <a href="{% url 'questions:my_scrapped_questions' %}"
+                class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 transition">
+                <span>⭐</span>
+                <span>내가 찜한 목록 보기</span>
+            </a>
+            {% endif %}
+
 
             <!-- 커뮤니티 링크 -->
             <a href="{% url 'discussions:post_list' %}" class="flex items-center gap-2 px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
