@@ -34,6 +34,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="px-6 py-4 text-sm font-bold text-gray-600">직책</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-600">이름</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-600">전화번호</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-600 text-center">관리</th>
@@ -43,6 +44,9 @@
                         {% for profile in people %}
                         {% if not profile.permission %}
                         <tr class="hover:bg-green-50/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="font-semibold text-gray-800">{{ profile.role }}</span>
+                            </td>
                             <td class="px-6 py-4">
                                 <span class="font-semibold text-gray-800">{{ profile.name }}</span>
                             </td>

@@ -12,14 +12,15 @@
                 + 새 글 작성
             </a>
 
-            <!-- 전체 보기 -->
-            <a href="{% url 'discussions:post_list' %}" class="block px-4 py-2 mb-2 rounded-md bg-gray-100 font-semibold transition-colors">
-                💬 전체 게시글
-            </a>
 
             <!-- 질문 게시판 링크 -->
             <a href="{% url 'questions:list' %}" class="block px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
-                📋 질문 게시판
+                📋 전체 질문
+            </a>
+
+            <!-- 전체 보기 -->
+            <a href="{% url 'discussions:post_list' %}" class="block px-4 py-2 mb-2 rounded-md bg-gray-100 font-semibold transition-colors">
+                💬 커뮤니티
             </a>
 
             <!-- 정렬 옵션 -->
