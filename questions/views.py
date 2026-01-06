@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count
 from users.decorators import staff_required
-
+from users.models import Profile 
 
 # Create your views here.
 
@@ -122,7 +122,8 @@ def my_questions(request):
 def my_scrapped_questions(request):
    
     #  내가 찜한 질문들 가져오기 
-    questions = Question.objects.filter(scraps=request.user)
+    profile = get_object_or_404(Profile, phone_number=request.user.username)
+    questions = Question.objects.filter(scraps=profile)
     faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
 
     # 정렬 (기본 최신순)
@@ -148,28 +149,36 @@ def my_scrapped_questions(request):
 #찜기능 구현
 @login_required
 def toggle_scrap(request, pk):
-
     if request.method != "POST":
         return redirect("questions:detail", pk=pk)
 
     question = get_object_or_404(Question, pk=pk)
 
-    # 이미 찜했으면 해제, 아니면 찜
-    if request.user in question.scraps.all():
-        question.scraps.remove(request.user)
-    else:
-        question.scraps.add(request.user)
+    # ✅ User -> Profile 매핑 (네 프로젝트는 username=phone_number로 쓰고 있었지)
+    profile = get_object_or_404(Profile, phone_number=request.user.username)
 
-    # 눌렀던 페이지로 다시 돌아가기 (없으면 상세로)
-    return redirect(request.META.get("HTTP_REFERER", "questions:detail"))
+    if question.scraps.filter(pk=profile.pk).exists():
+        question.scraps.remove(profile)
+    else:
+        question.scraps.add(profile)
+
+    ref = request.META.get("HTTP_REFERER")
+    if ref:
+        return redirect(ref)
+    return redirect("questions:detail", pk=pk)
+
 
 def question_detail(request, pk):
     """질문 상세 페이지"""
     question = get_object_or_404(Question, pk=pk)
     answers = question.answers.all()
+    profile = None
+    if request.user.is_authenticated:
+        profile = Profile.objects.filter(phone_number=request.user.username).first()
     context = {
         "question": question,
         "answers": answers,
+        "profile": profile,
     }
     return render(request, "questions/question_detail.html", context)
 

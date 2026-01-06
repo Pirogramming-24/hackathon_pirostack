@@ -65,7 +65,7 @@
             <form method="post" action="{% url 'questions:toggle_scrap' question.pk %}" style="display: inline;">
                 {% csrf_token %}
                 {% if user.is_authenticated %}
-                    {% if user in question.scraps.all %}
+                    {% if profile and profile in question.scraps.all %}
                         <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-yellow-400 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors">
                             ★ 찜 해제 <span class="text-yellow-600">({{ question.scraps.count }})</span>
                         </button>
