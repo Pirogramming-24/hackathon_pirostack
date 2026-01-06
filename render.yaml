@@ -14,7 +14,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "pirostack-web.onrender.com"
+        value: "hackathon-pirostack-1.onrender.com"
     # 배포 전 DB 마이그레이션을 수행 (실패 시 배포 중단되어 안전함)
     preDeployCommand: python manage.py migrate --noinput
     # 서비스 시작 명령 (정적 파일 수집은 Docker 빌드 시 수행하도록 변경 추천)
