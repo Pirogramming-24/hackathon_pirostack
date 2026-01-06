@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="content">
+        <form method="POST">
+            {%csrf_token%}
+            <label for="phone_number">전화번호</label>
+            <input type="tel" id="phone_number" name="phone_number"
+                                placeholder="12345678" pattern="[0-9]{8}" required>
+            <a href="{%url 'users:signUp'%}">회원가입</a>
+            <button type="submit">제출</button>
+        </form>
+    </div>
+</body>
+</html>
