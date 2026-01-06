@@ -48,19 +48,19 @@ def signupPass(request, pk):
 
 
 def login(request):
+
     load_dotenv()
-    secret_key = os.environ.get("SECRET_KEY")
-    secret_password = os.environ.get("SECRET_PASSWORD")
-    if request.method == "POST":
-        phone_number = request.POST.get("phone_number")
-        password = request.POST.get("password")
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+        # password = request.POST.get('password')
 
         # if check_password(password,secret_password) and phone_number==secret_key:#슈퍼 어드민
         #     print('')
         #     return redirect('users:superadmin')
-        if phone_number == secret_key:  # 슈퍼 어드민
-            print("iii")
-            return redirect("users:superadmin")
+
+        # if phone_number==secret_key:#슈퍼 어드민
+        #     print('iii')
+        #     return redirect('users:superadmin')
         try:
             profile = Profile.objects.get(phone_number=phone_number)  # 프로필 객체 id겟
         except Profile.DoesNotExist:
@@ -90,10 +90,11 @@ def loginPass(request, pk):
         print(request.POST.get("password"))
         if profile.password == request.POST.get("password"):
             # 세션에 사용자 정보 저장
-            request.session["user_id"] = profile.id
-            request.session["is_staff"] = profile.is_staff
-            request.session["phone_number"] = profile.phone_number
-            request.session["name"] = profile.name
+            request.session['user_role'] = profile.role
+            request.session['user_id'] = profile.id
+            request.session['is_staff'] = profile.is_staff
+            request.session['phone_number'] = profile.phone_number
+            request.session['name'] = profile.name
             # 운영진은 staff 대시보드로 이동
             if profile.is_staff:
                 return redirect("questions:staff_unanswered")
