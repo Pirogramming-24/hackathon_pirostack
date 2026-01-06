@@ -46,7 +46,7 @@
     </div>
 
     <div class="p-5 bg-white">
-        <div class="prose max-w-none text-gray-800 leading-relaxed mb-4 whitespace-pre-wrap">
+        <div class="prose max-w-none text-gray-800 leading-relaxed">
             {{ post.content|linebreaks }}
         </div>
 
@@ -86,7 +86,7 @@
 
         <!-- 댓글 내용 -->
         <div class="p-5 bg-white">
-            <div class="prose max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap">
+            <div class="prose max-w-none text-gray-800 leading-relaxed">
                 {{ comment.content|linebreaks }}
             </div>
         </div>
@@ -107,7 +107,7 @@
 {% endif %}
 
 
-<!-- 댓글 등록 폼 -->
+<!-- 댓글 등록 -->
 <form method="post" action="{% url 'discussions:comment_create' post.id %}">
         {% csrf_token %}
         <textarea name="content" rows="6" required class="w-full p-4 border-0 focus:ring-0 outline-none resize-none" placeholder="Leave a comment"></textarea>
@@ -116,7 +116,7 @@
         </div>
 </form>
 
-
+<!-- 목록 이동 -->
 <div class="mt-6">
     <a href="{% url 'discussions:post_list' %}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
