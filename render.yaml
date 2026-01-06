@@ -15,8 +15,11 @@ services:
         value: "False"
       - key: ALLOWED_HOSTS
         value: "pirostack-web.onrender.com"
-    # 실행 시 마이그레이션과 정적 파일 수집을 먼저 수행합니다.
-    dockerCommand: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:8000 hackathon.wsgi:application"
+    # 배포 전 DB 마이그레이션을 수행 (실패 시 배포 중단되어 안전함)
+    preDeployCommand: python manage.py migrate --noinput
+    # 서비스 시작 명령 (정적 파일 수집은 Docker 빌드 시 수행하도록 변경 추천)
+    dockerCommand: gunicorn --bind 0.0.0.0:8000 hackathon.wsgi:application
+    healthCheckPath: /healthz
 
 databases:
   - name: pirostack-db

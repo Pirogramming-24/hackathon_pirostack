@@ -21,11 +21,18 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from users import views as user_views
+from django.http import HttpResponse
+
+
+def healthz(request):
+    return HttpResponse("ok")
+
 
 urlpatterns = [
+    path("healthz", healthz),  # Render Health Check를 위한 경로
     path("admin/", admin.site.urls),
-    path('', RedirectView.as_view(url='/users/', permanent=False)),
-    path('login/', user_views.login, name='login'),  # 프로젝트 레벨에서 login URL 추가
+    path("", RedirectView.as_view(url="/users/", permanent=False)),
+    path("login/", user_views.login, name="login"),  # 프로젝트 레벨에서 login URL 추가
     path("questions/", include("questions.urls")),
     path("users/", include("users.urls")),
     path("discussions/", include("discussions.urls")),

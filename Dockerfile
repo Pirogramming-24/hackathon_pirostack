@@ -17,6 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
+# 빌드 시점에 정적 파일을 미리 수집 (서버 실행 속도 향상)
+RUN python manage.py collectstatic --no-input --settings=hackathon.settings
+
 EXPOSE 8000
 
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "hackathon.wsgi:application"]
