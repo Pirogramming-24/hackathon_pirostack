@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import Question, Category, Answer
 from .forms import QuestionForm, AnswerForm
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count
 
@@ -11,31 +13,154 @@ from django.db.models import Count
 
 def question_list(request):
     """전체 질문 목록"""
+    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
+    #검색
     questions = Question.objects.all()
+    q = request.GET.get("q", "").strip()
+    if q:
+        questions = questions.filter(Q(title__icontains=q) | Q(content__icontains=q))
+
+    #정렬
+    sort_param = request.GET.get("sort", "latest")
+    if sort_param =="oldest":
+        questions = questions.order_by("created_at", "id")
+    else:
+        questions = questions.order_by("-created_at", "-id")
     categories = Category.objects.all()
     context = {
         "questions": questions,
+        "faq_questions":faq_questions,
         "categories": categories,
+        "selected_sort": sort_param,
+        "selected_category":None,
+        "q":q,
     }
+    
+
     return render(request, "questions/question_list.html", context)
 
 
 def question_list_by_category(request, category_id):
+
+
     """
     [이서현] 카테고리별, 과제별, 시간순 정렬 및 필터링
     TODO: 커스텀 정렬 API 및 필터링 뷰 구현
     """
+    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
     # 에러 방지를 위한 기본 구현
-    category = get_object_or_404(Category, pk=category_id)
-    questions = Question.objects.filter(category=category)
+    category = get_object_or_404(Category, pk=category_id)  
+    questions = Question.objects.filter(category=category)    
+
+    #화면 렌더링에 필요한 카테고리 목록
     categories = Category.objects.all()
+    sort_param = request.GET.get("sort", "latest") #기본값 lagtest로 설정
+    session_categories = Category.objects.filter(category_type="session").order_by("name")
+    assignment_categories = Category.objects.filter(category_type="assignment").order_by("name")
+
+     #질문 검색
+    q = request.GET.get("q", "").strip()
+
+    if q:
+        questions = questions.filter(
+            Q(title__icontains=q) | Q(content__icontains=q)
+        )
+
+    #시간순 정렬 
+    if sort_param == "oldest":
+        questions = questions.order_by("created_at")
+    else:
+        questions = questions.order_by("-created_at")
+
+    
+    #템플릿에 전달할 데이터 꾸러미(context)
     context = {
         "questions": questions,
+        "faq_questions":faq_questions,
         "categories": categories,
         "selected_category": category,
+
+        "session_categories": session_categories,
+        "assignment_categories": assignment_categories,
+        "selected_sort": sort_param,
+        "q":q,
+    }
+
+   
+    #질문 리스트 페이지 렌더링
+    return render(request, "questions/question_list.html", context)
+
+@login_required
+def my_questions(request):
+    #내가 작성한 질문 리스트
+    questions = Question.objects.filter(author=request.user)
+    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
+
+    #정렬
+    sort_param=request.GET.get("sort","latest")
+    if sort_param == "oldest":
+        questions = questions.order_by("created_at", "id")
+    else:
+        questions = questions.order_by("-created_at", "-id")
+
+    #카테고리 드롭다운
+    categories = Category.objects.all().order_by("id")
+
+    context = {
+        "questions": questions,
+        "faq_questions": faq_questions,
+        "categories": categories,
+        "selected_category": None,
+        "selected_sort": sort_param,
+        "page_title": "내가 작성한 질문",
     }
     return render(request, "questions/question_list.html", context)
 
+
+@login_required
+def my_scrapped_questions(request):
+   
+    #  내가 찜한 질문들 가져오기 
+    questions = Question.objects.filter(scraps=request.user)
+    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
+
+    # 정렬 (기본 최신순)
+    sort_param = request.GET.get("sort", "latest")
+    if sort_param == "oldest":
+        questions = questions.order_by("created_at", "id")
+    else:
+        questions = questions.order_by("-created_at", "-id")
+
+    categories = Category.objects.all().order_by("id")
+
+    context = {
+        "questions": questions,
+        "categories": categories,
+        "selected_category": None,
+        "selected_sort": sort_param,
+        "page_title": "내가 찜한 질문",
+        "faq_questions": faq_questions,
+        
+    }
+    return render(request, "questions/question_list.html", context)
+
+#찜기능 구현
+@login_required
+def toggle_scrap(request, pk):
+
+    if request.method != "POST":
+        return redirect("questions:detail", pk=pk)
+
+    question = get_object_or_404(Question, pk=pk)
+
+    # 이미 찜했으면 해제, 아니면 찜
+    if request.user in question.scraps.all():
+        question.scraps.remove(request.user)
+    else:
+        question.scraps.add(request.user)
+
+    # 눌렀던 페이지로 다시 돌아가기 (없으면 상세로)
+    return redirect(request.META.get("HTTP_REFERER", "questions:detail"))
 
 def question_detail(request, pk):
     """질문 상세 페이지"""
