@@ -16,7 +16,8 @@ def signUp(request):
         name = request.POST.get('name')
 
         if Profile.objects.filter(phone_number=phone_number).exists():
-            return render(request,"signUp.html",{"error":"이미 가입된 번호입니다"})
+            messages.error(request,"가입된 번호입니다!!")
+            return render(request,"signUp.html")
 
         if role == 'Executive':
             is_staff = True
@@ -32,6 +33,7 @@ def signUp(request):
         if role == 'Executive':
             return redirect('users:signupPass',pk=new_profile.id)
         return redirect('users:login')
+        messages.success(request,"로그인 성공!!")
     return render(request,"signUp.html")
 
 def signupPass(request,pk):
@@ -75,6 +77,9 @@ def login(request):
             request.session['phone_number'] = profile.phone_number
             request.session['name'] = profile.name
             return redirect('questions:list')
+        else:
+            messages.error(request,"계정 승인을 기다려주세요")
+            redirect('users:login')
     return render(request,'login.html')
 
 def loginPass(request,pk):
