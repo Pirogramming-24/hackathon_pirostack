@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import Profile
 
 # Create your models here.
 
@@ -27,7 +27,7 @@ class Question(models.Model):
         Category, on_delete=models.CASCADE, related_name="questions"
     )
     author = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="questions"
+        Profile, on_delete=models.SET_NULL, null=True, related_name="questions"
     )
     title = models.CharField(max_length=200)
     content = models.TextField()
@@ -37,11 +37,11 @@ class Question(models.Model):
     is_anonymous = models.BooleanField(default=True)  # 익명 여부
 
     # [이서현 의존성] 찜하기 기능 (Many-to-Many)
-    scraps = models.ManyToManyField(User, related_name="scrapped_questions", blank=True)
+    scraps = models.ManyToManyField(Profile, related_name="scrapped_questions", blank=True)
 
     is_faq = models.BooleanField(default=False)
     faq_order = models.PositiveIntegerField(default=0)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -56,7 +56,7 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name="answers"
     )
     author = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="answers"
+        Profile, on_delete=models.SET_NULL, null=True, related_name="answers"
     )
     content = models.TextField()
 
@@ -75,4 +75,3 @@ class Answer(models.Model):
 
 
 # TODO: [이서현] FAQ 모델 및 API 구현 (자주 묻는 질문, 꿀팁 등)
-    
