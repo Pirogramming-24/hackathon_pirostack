@@ -7,6 +7,31 @@
     <!-- 사이드바 -->
     <aside class="w-64 flex-shrink-0 border-r border-gray-200 bg-white px-6 py-8 min-h-screen">
         <div class="sticky top-24">
+<form method="get"
+      action="{% if selected_category %}{% url 'questions:list_by_category' selected_category.id %}{% else %}{% url 'questions:list' %}{% endif %}"
+      class="mb-3">
+  <div class="flex items-center gap-2">
+    <input
+      type="text"
+      name="q"
+      value="{{ q|default:'' }}"
+      placeholder="질문 검색..."
+      class="flex-1 min-w-0 h-10 px-4 rounded-lg border border-gray-200 bg-white
+             text-sm placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-[#059212] focus:border-transparent"
+    />
+    <button
+      type="submit"
+      class="h-10 px-4 rounded-lg bg-[#059212] text-white text-sm font-medium
+             hover:bg-[#06D001] transition-colors flex-shrink-0"
+    >
+      검색
+    </button>
+  </div>
+</form>
+
+
+
             <!-- 질문하기 버튼 -->
             <a href="{% url 'questions:create' %}" class="block w-full mb-6 px-4 py-2 bg-[#059212] text-white text-center rounded-lg hover:bg-[#06D001] transition-colors font-medium">
                 + 질문하기
