@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count
+from users.decorators import staff_required
 
 
 # Create your views here.
@@ -298,12 +299,8 @@ def reply_create(request, pk, answer_pk):
 """
 [김서윤] 운영진 대시보드
 """
-# def staff_required(user):
-#     return user.is_authenticated and user.is_staff
 
-# @user_passes_test(staff_required, login_url="/")
-
-
+@staff_required
 def staff_unanswered(request):
     questions = Question.objects.filter(is_resolved=False)
 
@@ -347,6 +344,7 @@ def staff_unanswered(request):
 
 
 
+@staff_required
 def category_list(request):
     """카테고리 리스트"""
     sort = request.GET.get("sort", "latest")  # latest = 세션, oldest = 과제
@@ -361,6 +359,7 @@ def category_list(request):
     })
 
 
+@staff_required
 def category_create(request):
     """카테고리 생성"""
     if request.method == "POST":
@@ -373,6 +372,7 @@ def category_create(request):
     return render(request, "questions/category_form.html", {"action": "add"})
 
 
+@staff_required
 def category_update(request, pk):
     """카테고리 수정"""
     category = get_object_or_404(Category, pk=pk)
@@ -388,6 +388,7 @@ def category_update(request, pk):
     return render(request, "questions/category_form.html", {"category": category, "action": "edit"})
 
 
+@staff_required
 def category_delete(request, pk):
     """카테고리 삭제"""
     category = get_object_or_404(Category, pk=pk)
