@@ -9,16 +9,10 @@
 <div class="mb-6">
     <div class="flex items-start gap-3 mb-3">
         <h1 class="text-3xl font-bold flex-1">{{ question.title }}</h1>
-        <div class="flex gap-2">
-            <a href="{% url 'questions:update' question.pk %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
-            <form method="post" action="{% url 'questions:delete' question.pk %}" style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                {% csrf_token %}
-                <button type="submit" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-red-600">삭제</button>
-            </form>
-        </div>
     </div>
 
-    <div class="flex items-center gap-3 text-sm text-gray-600">
+    <div class="flex items-center justify-between text-sm text-gray-600">
+        <div class="flex items-center gap-3">
         <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded {% if question.is_resolved %}bg-purple-100 text-purple-700{% else %}bg-gray-100 text-gray-600{% endif %}">
             {% if question.is_resolved %}
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
@@ -41,6 +35,22 @@
             </svg>
             {{ answers.count }} comments
         </span>
+        </div>
+        <div class="flex gap-2">
+            {% if is_staff %}
+            <form method="post" action="{% url 'questions:faq' question.pk %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors {% if question.is_faq %}bg-yellow-50 border-yellow-400 text-yellow-700{% endif %}">
+                    {% if question.is_faq %}FAQ 해제{% else %}FAQ 등록{% endif %}
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'questions:update' question.pk %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            <form method="post" action="{% url 'questions:delete' question.pk %}" style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-red-600">삭제</button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -65,8 +75,8 @@
         <div class="flex gap-2 mt-4 pt-4 border-t border-gray-200">
             <form method="post" action="{% url 'questions:toggle_scrap' question.pk %}" style="display: inline;">
                 {% csrf_token %}
-                {% if user.is_authenticated %}
-                    {% if profile and profile in question.scraps.all %}
+                {% if profile %}
+                    {% if profile in question.scraps.all %}
                         <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-yellow-400 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors">
                             ★ 찜 해제 <span class="text-yellow-600">({{ question.scraps.count }})</span>
                         </button>
@@ -76,8 +86,8 @@
                         </button>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'login' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                        ☆ 찜하기 (로그인 필요)
+                    <a href="{% url 'users:login' %}?next={{ request.path }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                        ☆ 찜하기 <span class="text-gray-600">({{ question.scraps.count }})</span>
                     </a>
                 {% endif %}
             </form>
