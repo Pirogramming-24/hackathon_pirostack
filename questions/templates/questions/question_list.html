@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}질문 게시판{% endblock %}
 
@@ -7,18 +8,33 @@
     <!-- 사이드바 -->
     <aside class="w-64 flex-shrink-0 border-r border-gray-200 bg-white px-6 py-8 min-h-screen">
         <div class="sticky top-24">
+            {% if show_search_bar %}
+            <form action="" method="get" class="mb-6">
+                <div class="relative">
+                    <input type="text" name="q" value="{{ q }}" placeholder="검색어를 입력하세요" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#059212] transition-colors">
+                    <img src="{% static 'icons/search.svg' %}" alt="검색" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 opacity-50">
+                </div>
+            </form>
+            {% endif %}
+
             <!-- 질문하기 버튼 -->
             <a href="{% url 'questions:create' %}" class="block w-full mb-6 px-4 py-2 bg-[#059212] text-white text-center rounded-lg hover:bg-[#06D001] transition-colors font-medium">
                 + 질문하기
             </a>
 
             <!-- 전체 보기 -->
-            <a href="{% url 'questions:list' %}" class="flex items-center gap-2 px-4 py-2 mb-2 rounded-md {% if not selected_category %}bg-gray-100 font-semibold{% else %}hover:bg-gray-50{% endif %} transition-colors">
+            <a href="{% url 'questions:list' %}" class="flex items-center gap-2 px-4 py-2 mb-2 rounded-md {% if not selected_category and not selected_filter %}bg-gray-100 font-semibold{% else %}hover:bg-gray-50{% endif %} transition-colors">
                 <svg width="20" height="20" viewBox="0 0 198 198" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M140.25 165H33V57.75C33 53.2125 29.2875 49.5 24.75 49.5C20.2125 49.5 16.5 53.2125 16.5 57.75V165C16.5 174.075 23.925 181.5 33 181.5H140.25C144.788 181.5 148.5 177.788 148.5 173.25C148.5 168.712 144.788 165 140.25 165Z" fill="currentColor"/>
                     <path d="M165 16.5H66C56.925 16.5 49.5 23.925 49.5 33V132C49.5 141.075 56.925 148.5 66 148.5H165C174.075 148.5 181.5 141.075 181.5 132V33C181.5 23.925 174.075 16.5 165 16.5ZM115.583 123.75C110.715 123.75 106.92 119.872 106.92 115.087C106.92 110.22 110.798 106.507 115.583 106.507C120.45 106.507 124.163 110.22 124.163 115.087C124.08 119.872 120.45 123.75 115.583 123.75ZM136.208 72.8475C131.01 80.52 126.06 82.83 123.337 87.78C122.677 88.935 122.265 89.925 122.017 91.8225C121.605 95.04 119.047 97.4325 115.83 97.4325H115.583C111.953 97.4325 109.065 94.2975 109.395 90.6675C109.643 88.3575 110.138 85.965 111.458 83.7375C114.84 77.715 121.193 74.1675 124.905 68.8875C128.865 63.2775 126.638 52.8825 115.5 52.8825C110.467 52.8825 107.167 55.5225 105.105 58.6575C103.537 61.05 100.403 61.875 97.7625 60.72C94.2975 59.235 92.8125 54.945 94.9575 51.8925C99.165 45.7875 106.177 41.25 115.417 41.25C125.565 41.25 132.577 45.87 136.125 51.645C139.178 56.6775 140.91 65.9175 136.208 72.8475Z" fill="currentColor"/>
                 </svg>
                 <span>전체 질문</span>
+            </a>
+
+            <!-- FAQ -->
+            <a href="{% url 'questions:list' %}?filter=faq" class="flex items-center gap-2 px-4 py-2 mb-2 rounded-md {% if selected_filter == 'faq' %}bg-gray-100 font-semibold{% else %}hover:bg-gray-50{% endif %} transition-colors">
+                <img src="{% static 'icons/faq.svg' %}" alt="FAQ" class="w-5 h-5">
+                <span>FAQ</span>
             </a>
 
             <!-- 커뮤니티 링크 -->

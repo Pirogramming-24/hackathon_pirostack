@@ -61,44 +61,6 @@
         <div class="prose max-w-none text-gray-800 leading-relaxed">
             {{ question.content|linebreaks }}
         </div>
-
-        <div class="flex gap-2 mt-4 pt-4 border-t border-gray-200">
-            <form method="post" action="{% url 'questions:toggle_scrap' question.pk %}" style="display: inline;">
-                {% csrf_token %}
-                {% if current_profile %}
-                    {% if current_profile in question.scraps.all %}
-                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-yellow-400 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors">
-                            ★ 찜 해제 <span class="text-yellow-600">({{ question.scraps.count }})</span>
-                        </button>
-                    {% else %}
-                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                            ☆ 찜하기 <span class="text-gray-600">({{ question.scraps.count }})</span>
-                        </button>
-                    {% endif %}
-                {% else %}
-                    <a href="{% url 'users:login' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                        ☆ 찜하기
-                    </a>
-                {% endif %}
-            </form>
-
-            <form method="post" action="{% url 'questions:resolve' question.pk %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                    {% if question.is_resolved %}
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l4.5-4.5z"/>
-                        </svg>
-                        미해결로 표시
-                    {% else %}
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l4.5-4.5z"/>
-                        </svg>
-                        해결됨으로 표시
-                    {% endif %}
-                </button>
-            </form>
-        </div>
     </div>
 </div>
 

@@ -13,82 +13,95 @@ from users.models import Profile
 
 def question_list(request):
     """전체 질문 목록"""
-    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
-    #검색
-    questions = Question.objects.all()
+    faq_questions = Question.objects.filter(is_faq=True).order_by(
+        "faq_order", "-created_at"
+    )[:5]
+    # 검색
+    questions = Question.objects.all().order_by("-created_at", "-id")  # 기본 정렬
+
+    # FAQ 필터
+    filter_param = request.GET.get("filter", "")
+    if filter_param == "faq":
+        questions = questions.filter(is_faq=True)
+
     q = request.GET.get("q", "").strip()
     if q:
         questions = questions.filter(Q(title__icontains=q) | Q(content__icontains=q))
 
-    #정렬
+    # 정렬
     sort_param = request.GET.get("sort", "latest")
-    if sort_param =="oldest":
+    if sort_param == "oldest":
         questions = questions.order_by("created_at", "id")
-    else:
+    elif sort_param == "latest":
         questions = questions.order_by("-created_at", "-id")
+
     categories = Category.objects.all()
     context = {
+        "is_staff": request.is_staff,  # 운영진 여부 전달
+        "show_search_bar": not request.is_staff,  # 부원에게만 검색창 표시
         "questions": questions,
-        "faq_questions":faq_questions,
+        "faq_questions": faq_questions,
         "categories": categories,
         "selected_sort": sort_param,
-        "selected_category":None,
-        "q":q,
+        "selected_filter": filter_param,
+        "selected_category": None,
+        "q": q,
     }
-    
 
     return render(request, "questions/question_list.html", context)
 
 
 def question_list_by_category(request, category_id):
-
-
     """
     [이서현] 카테고리별, 과제별, 시간순 정렬 및 필터링
     TODO: 커스텀 정렬 API 및 필터링 뷰 구현
     """
-    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
+    faq_questions = Question.objects.filter(is_faq=True).order_by(
+        "faq_order", "-created_at"
+    )[:5]
     # 에러 방지를 위한 기본 구현
-    category = get_object_or_404(Category, pk=category_id)  
-    questions = Question.objects.filter(category=category)    
+    category = get_object_or_404(Category, pk=category_id)
+    questions = Question.objects.filter(category=category)
 
-    #화면 렌더링에 필요한 카테고리 목록
+    # 화면 렌더링에 필요한 카테고리 목록
     categories = Category.objects.all()
-    sort_param = request.GET.get("sort", "latest") #기본값 lagtest로 설정
-    session_categories = Category.objects.filter(category_type="session").order_by("name")
-    assignment_categories = Category.objects.filter(category_type="assignment").order_by("name")
+    sort_param = request.GET.get("sort", "latest")  # 기본값 lagtest로 설정
+    session_categories = Category.objects.filter(category_type="session").order_by(
+        "name"
+    )
+    assignment_categories = Category.objects.filter(
+        category_type="assignment"
+    ).order_by("name")
 
-     #질문 검색
+    # 질문 검색
     q = request.GET.get("q", "").strip()
 
     if q:
-        questions = questions.filter(
-            Q(title__icontains=q) | Q(content__icontains=q)
-        )
+        questions = questions.filter(Q(title__icontains=q) | Q(content__icontains=q))
 
-    #시간순 정렬 
+    # 시간순 정렬
     if sort_param == "oldest":
         questions = questions.order_by("created_at")
     else:
         questions = questions.order_by("-created_at")
 
-    
-    #템플릿에 전달할 데이터 꾸러미(context)
+    # 템플릿에 전달할 데이터 꾸러미(context)
     context = {
+        "is_staff": request.is_staff,  # 운영진 여부 전달
+        "show_search_bar": not request.is_staff,  # 부원에게만 검색창 표시
         "questions": questions,
-        "faq_questions":faq_questions,
+        "faq_questions": faq_questions,
         "categories": categories,
         "selected_category": category,
-
         "session_categories": session_categories,
         "assignment_categories": assignment_categories,
         "selected_sort": sort_param,
-        "q":q,
+        "q": q,
     }
 
-   
-    #질문 리스트 페이지 렌더링
+    # 질문 리스트 페이지 렌더링
     return render(request, "questions/question_list.html", context)
+
 
 def my_questions(request):
     # 로그인 확인 (세션 기반)
@@ -99,7 +112,9 @@ def my_questions(request):
     # 내가 작성한 질문 리스트
     profile = get_object_or_404(Profile, pk=profile_id)
     questions = Question.objects.filter(author=profile)
-    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
+    faq_questions = Question.objects.filter(is_faq=True).order_by(
+        "faq_order", "-created_at"
+    )[:5]
 
     # 정렬
     sort_param = request.GET.get("sort", "latest")
@@ -112,6 +127,7 @@ def my_questions(request):
     categories = Category.objects.all().order_by("id")
 
     context = {
+        "is_staff": request.is_staff,  # 운영진 여부 전달
         "questions": questions,
         "faq_questions": faq_questions,
         "categories": categories,
@@ -131,7 +147,9 @@ def my_scrapped_questions(request):
     # 내가 찜한 질문들 가져오기
     profile = get_object_or_404(Profile, pk=profile_id)
     questions = Question.objects.filter(scraps=profile)
-    faq_questions = Question.objects.filter(is_faq=True).order_by("faq_order", "-created_at")[:5]
+    faq_questions = Question.objects.filter(is_faq=True).order_by(
+        "faq_order", "-created_at"
+    )[:5]
 
     # 정렬 (기본 최신순)
     sort_param = request.GET.get("sort", "latest")
@@ -143,6 +161,7 @@ def my_scrapped_questions(request):
     categories = Category.objects.all().order_by("id")
 
     context = {
+        "is_staff": request.is_staff,  # 운영진 여부 전달
         "questions": questions,
         "categories": categories,
         "selected_category": None,
@@ -151,6 +170,7 @@ def my_scrapped_questions(request):
         "faq_questions": faq_questions,
     }
     return render(request, "questions/question_list.html", context)
+
 
 # 찜기능 구현
 def toggle_scrap(request, pk):
@@ -175,6 +195,7 @@ def toggle_scrap(request, pk):
     # 눌렀던 페이지로 다시 돌아가기 (없으면 상세로)
     return redirect(request.META.get("HTTP_REFERER", "questions:detail"))
 
+
 def question_detail(request, pk):
     """질문 상세 페이지"""
     question = get_object_or_404(Question, pk=pk)
@@ -190,6 +211,7 @@ def question_detail(request, pk):
             pass
 
     context = {
+        "is_staff": request.is_staff,  # 운영진 여부 전달
         "question": question,
         "answers": answers,
         "current_profile": current_profile,
@@ -210,7 +232,22 @@ def question_create(request):
     else:
         form = QuestionForm()
 
-    return render(request, "questions/question_form.html", {"form": form})
+    session_categories = Category.objects.filter(category_type="session").order_by(
+        "name"
+    )
+    assignment_categories = Category.objects.filter(
+        category_type="assignment"
+    ).order_by("name")
+
+    return render(
+        request,
+        "questions/question_form.html",
+        {
+            "form": form,
+            "session_categories": session_categories,
+            "assignment_categories": assignment_categories,
+        },
+    )
 
 
 def answer_create(request, pk):
@@ -260,7 +297,22 @@ def question_update(request, pk):
     else:
         form = QuestionForm(instance=question)
 
-    return render(request, "questions/question_form.html", {"form": form})
+    session_categories = Category.objects.filter(category_type="session").order_by(
+        "name"
+    )
+    assignment_categories = Category.objects.filter(
+        category_type="assignment"
+    ).order_by("name")
+
+    return render(
+        request,
+        "questions/question_form.html",
+        {
+            "form": form,
+            "session_categories": session_categories,
+            "assignment_categories": assignment_categories,
+        },
+    )
 
 
 def question_delete(request, pk):
@@ -282,14 +334,13 @@ def question_scrap(request, pk):
         # 현재는 간단히 전체 카운트만 증가/감소
 
         # 임시: 세션 기반 찜하기
-        scrapped = request.session.get(f'scrapped_{pk}', False)
-        request.session[f'scrapped_{pk}'] = not scrapped
+        scrapped = request.session.get(f"scrapped_{pk}", False)
+        request.session[f"scrapped_{pk}"] = not scrapped
 
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return JsonResponse({
-                "scrapped": not scrapped,
-                "scrap_count": question.scraps.count()
-            })
+            return JsonResponse(
+                {"scrapped": not scrapped, "scrap_count": question.scraps.count()}
+            )
 
         return redirect("questions:detail", pk=pk)
 
@@ -315,13 +366,10 @@ def reply_create(request, pk, answer_pk):
     return redirect("questions:detail", pk=pk)
 
 
-
-
-
-
 """
 [김서윤] 운영진 대시보드
 """
+
 
 @staff_required
 def staff_list_by_category(request, category_id):
@@ -343,8 +391,12 @@ def staff_list_by_category(request, category_id):
 
     # 카테고리 정보
     categories = Category.objects.all().order_by("name")
-    session_categories = Category.objects.filter(category_type="session").order_by("name")
-    assignment_categories = Category.objects.filter(category_type="assignment").order_by("name")
+    session_categories = Category.objects.filter(category_type="session").order_by(
+        "name"
+    )
+    assignment_categories = Category.objects.filter(
+        category_type="assignment"
+    ).order_by("name")
 
     # 통계
     total_unanswered = Question.objects.filter(is_resolved=False).count()
@@ -394,29 +446,34 @@ def staff_unanswered(request):
         questions = questions.filter(category_id=category_id)
 
     # 통계
-    total_unanswered = Question.objects.filter(is_resolved=False).count() # 전체
-    category_stats = ( # 카테고리별 미답변 개수
+    total_unanswered = Question.objects.filter(is_resolved=False).count()  # 전체
+    category_stats = (  # 카테고리별 미답변 개수
         Question.objects.filter(is_resolved=False)
         .values("category__name")
         .annotate(count=Count("id"))
     )
 
-    session_categories = Category.objects.filter(category_type="session").order_by("name")
-    assignment_categories = Category.objects.filter(category_type="assignment").order_by("name")
+    session_categories = Category.objects.filter(category_type="session").order_by(
+        "name"
+    )
+    assignment_categories = Category.objects.filter(
+        category_type="assignment"
+    ).order_by("name")
 
-    return render(request, "questions/staff_unanswered.html", {
-    "questions": questions,
-    "sort": sort,
-    "include_answered": include_answered,
-    "total_unanswered": total_unanswered,
-    "category_stats": category_stats,
-
-    "session_categories": session_categories,
-    "assignment_categories": assignment_categories,
-    "categories": categories,
-
-    })
-
+    return render(
+        request,
+        "questions/staff_unanswered.html",
+        {
+            "questions": questions,
+            "sort": sort,
+            "include_answered": include_answered,
+            "total_unanswered": total_unanswered,
+            "category_stats": category_stats,
+            "session_categories": session_categories,
+            "assignment_categories": assignment_categories,
+            "categories": categories,
+        },
+    )
 
 
 @staff_required
@@ -424,14 +481,22 @@ def category_list(request):
     """카테고리 리스트"""
     sort = request.GET.get("sort", "latest")  # latest = 세션, oldest = 과제
     if sort == "latest":
-        categories = Category.objects.filter(category_type="session").order_by("-created_at")
+        categories = Category.objects.filter(category_type="session").order_by(
+            "-created_at"
+        )
     else:
-        categories = Category.objects.filter(category_type="assignment").order_by("-created_at")
+        categories = Category.objects.filter(category_type="assignment").order_by(
+            "-created_at"
+        )
 
-    return render(request, "questions/category_list.html", {
-        "categories": categories,
-        "sort": sort,
-    })
+    return render(
+        request,
+        "questions/category_list.html",
+        {
+            "categories": categories,
+            "sort": sort,
+        },
+    )
 
 
 @staff_required
@@ -460,7 +525,11 @@ def category_update(request, pk):
             category.save()
             return redirect("questions:category_list")
 
-    return render(request, "questions/category_form.html", {"category": category, "action": "edit"})
+    return render(
+        request,
+        "questions/category_form.html",
+        {"category": category, "action": "edit"},
+    )
 
 
 @staff_required
@@ -471,4 +540,6 @@ def category_delete(request, pk):
         category.delete()
         return redirect("questions:category_list")
 
-    return render(request, "questions/category_confirm_delete.html", {"category": category})
+    return render(
+        request, "questions/category_confirm_delete.html", {"category": category}
+    )
