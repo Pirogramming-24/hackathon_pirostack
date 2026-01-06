@@ -41,6 +41,22 @@
                 </div>
             </div>
             {% endif %}
+            {% if request.session.user_role == 'Super' %}
+            <div class="px-3 mb-2">
+                <a href="{% url 'users:superadmin' %}" 
+                class="flex items-center justify-center gap-2 w-full 
+                        bg-white text-red py-3 rounded-md text-sm font-bold 
+                        transition-all duration-200 shadow-md
+                        hover:bg-[#047a0f] hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.02]
+                        active:scale-[0.98]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    유저관리 마스터
+                </a>
+            </div>
+            <div class="mx-4 my-2 border-t border-gray-50"></div>
+            {% endif %}
         </div>
     </nav>
 
