@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}댓글 수정{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-8 py-8">
+    <h2 class="text-3xl font-bold mb-6">댓글 수정</h2>
+
+    <form method="post" class="border border-gray-200 rounded-lg p-4">
+        {% csrf_token %}
+        <textarea name="content" rows="6" required
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#059212] focus:border-transparent resize-none"
+        >{{ comment.content }}</textarea>
+
+        <div class="flex gap-3 pt-4">
+            <button type="submit"
+                class="px-6 py-2 bg-[#059212] text-white rounded-md hover:bg-[#06D001] transition-colors font-medium"
+            >수정 완료</button>
+            <a href="{% url 'discussions:post_detail' post_id %}"
+                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium"
+            >취소</a>
+        </div>
+        
+    </form>
+</div>
+{% endblock %}

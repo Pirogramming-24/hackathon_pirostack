@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-8 py-12">
+    <h1 class="text-2xl font-bold mb-8">{% if form.instance.pk %}질문 수정하기{% else %}질문 작성하기{% endif %}</h1>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- 에러 메시지 표시 -->
+        {% if form.errors %}
+        <div class="bg-red-50 text-red-600 p-4 rounded-lg text-sm">
+            <p class="font-bold mb-1">입력 내용을 확인해주세요.</p>
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <!-- 카테고리 타입 선택 (세션 vs 과제) -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">카테고리 선택</label>
+            <div class="flex gap-2 mb-4">
+                <button type="button" id="btn-session" onclick="selectType('session')" 
+                    class="flex-1 py-3 border-2 rounded-lg font-medium transition-all border-[#059212] bg-[#059212] text-white">
+                    세션
+                </button>
+                <button type="button" id="btn-assignment" onclick="selectType('assignment')" 
+                    class="flex-1 py-3 border-2 border-gray-200 rounded-lg font-medium text-gray-500 hover:border-gray-300 transition-all bg-white">
+                    과제
+                </button>
+            </div>
+            
+            <!-- 세션 카테고리 목록 -->
+            <div id="session-categories" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {% for category in session_categories %}
+                <label class="cursor-pointer">
+                    <input type="radio" name="category" value="{{ category.id }}" class="peer sr-only" {% if form.category.value|stringformat:"s" == category.id|stringformat:"s" %}checked{% endif %} required>
+                    <div class="px-4 py-2 text-center text-sm border border-gray-200 rounded-md peer-checked:bg-[#059212] peer-checked:text-white peer-checked:border-[#059212] hover:bg-gray-50 transition-all">
+                        {{ category.name }}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- 과제 카테고리 목록 (초기에는 숨김) -->
+            <div id="assignment-categories" class="grid grid-cols-2 sm:grid-cols-3 gap-2 hidden">
+                {% for category in assignment_categories %}
+                <label class="cursor-pointer">
+                    <input type="radio" name="category" value="{{ category.id }}" class="peer sr-only" {% if form.category.value|stringformat:"s" == category.id|stringformat:"s" %}checked{% endif %}>
+                    <div class="px-4 py-2 text-center text-sm border border-gray-200 rounded-md peer-checked:bg-[#059212] peer-checked:text-white peer-checked:border-[#059212] hover:bg-gray-50 transition-all">
+                        {{ category.name }}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 제목 입력 -->
+        <div>
+            <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">제목</label>
+            <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#059212] focus:border-transparent outline-none transition-all" placeholder="질문 제목을 입력해주세요" required>
+        </div>
+
+        <!-- 내용 입력 -->
+        <div>
+            <label for="id_content" class="block text-sm font-medium text-gray-700 mb-1">내용</label>
+            <textarea name="content" id="id_content" rows="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#059212] focus:border-transparent outline-none transition-all resize-none" placeholder="질문 내용을 자세히 적어주세요" required>{{ form.content.value|default:'' }}</textarea>
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="flex justify-end gap-2 pt-4">
+            <a href="javascript:history.back()" class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors">취소</a>
+            <button type="submit" class="px-6 py-2.5 bg-[#059212] text-white rounded-lg hover:bg-[#047a0f] font-medium transition-colors">
+                {% if form.instance.pk %}수정 완료{% else %}질문 등록{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function selectType(type) {
+        const sessionBtn = document.getElementById('btn-session');
+        const assignmentBtn = document.getElementById('btn-assignment');
+        const sessionCats = document.getElementById('session-categories');
+        const assignmentCats = document.getElementById('assignment-categories');
+        
+        if (type === 'session') {
+            sessionBtn.className = "flex-1 py-3 border-2 rounded-lg font-medium transition-all border-[#059212] bg-[#059212] text-white";
+            assignmentBtn.className = "flex-1 py-3 border-2 border-gray-200 rounded-lg font-medium text-gray-500 hover:border-gray-300 transition-all bg-white";
+            sessionCats.classList.remove('hidden');
+            assignmentCats.classList.add('hidden');
+        } else {
+            sessionBtn.className = "flex-1 py-3 border-2 border-gray-200 rounded-lg font-medium text-gray-500 hover:border-gray-300 transition-all bg-white";
+            assignmentBtn.className = "flex-1 py-3 border-2 rounded-lg font-medium transition-all border-[#059212] bg-[#059212] text-white";
+            sessionCats.classList.add('hidden');
+            assignmentCats.classList.remove('hidden');
+        }
+    }
+
+    // 수정 시, 기존에 선택된 카테고리가 과제라면 과제 탭을 활성화
+    document.addEventListener('DOMContentLoaded', function() {
+        const assignmentChecked = document.querySelector('#assignment-categories input:checked');
+        if (assignmentChecked) {
+            selectType('assignment');
+        }
+    });
+</script>
+{% endblock %}

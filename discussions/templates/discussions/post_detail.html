@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-8 py-8">
+<!-- GitHub Issue 스타일 헤더 -->
+<div class="mb-6">
+    <div class="flex items-start gap-3 mb-3">
+        <h1 class="text-3xl font-bold flex-1">{{ post.title }}</h1>
+        {% if current_profile and post.author == current_profile %}
+            <div class="flex gap-2">
+                <a href="{% url 'discussions:post_edit' post.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            
+                <form method="post" action="{% url 'discussions:post_delete' post.id %}">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors">삭제</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="flex items-center gap-3 text-sm text-gray-600">
+        <span class="font-medium">익명</span>
+        <span>{{ post.created_at|date:"Y.m.d H:i" }}</span>
+        <span>·</span>
+        <span class="inline-flex items-center gap-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h4.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/>
+            </svg>
+            {{ comments.count }} comments
+        </span>
+    </div>
+</div>
+
+<!-- 게시글 본문 (GitHub comment 스타일) -->
+<div class="border border-gray-300 rounded-lg mb-6">
+    <div class="bg-gray-50 px-4 py-2 border-b border-gray-300 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-gray-700">
+            <div class="w-6 h-6 rounded-full bg-[#059212] flex items-center justify-center text-white font-bold text-xs">
+                {% if post.author %}{{ post.author.name|slice:":1"|upper }}{% else %}?{% endif %}
+            </div>
+            <span class="font-semibold">{% if post.author %}{{ post.author.name }}{% else %}익명{% endif %}</span>
+            <span class="text-gray-500">{{ post.created_at|date:"Y.m.d H:i" }}</span>
+        </div>
+    </div>
+
+    <div class="p-5 bg-white">
+        <div class="prose max-w-none text-gray-800 leading-relaxed">
+            {{ post.content|linebreaks }}
+        </div>
+
+        {% if post.image %}
+        <div class="mb-4">
+            <img src="{{ post.image.url }}" alt="첨부 이미지" class="max-w-full rounded-lg border border-gray-200">
+        </div>
+        {% endif %}
+
+        {% if post.link %}
+        <div class="pt-4 border-t border-gray-200">
+            <a href="{{ post.link }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z"/>
+                </svg>
+                참고 링크
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 댓글 목록 (GitHub comment thread 스타일) -->
+{% if comments %}
+    {% for comment in comments %}
+    <div class="border border-gray-300 rounded-lg mb-4">
+        <!-- 댓글 헤더 -->
+        <div class="bg-gray-50 px-4 py-2 border-b border-gray-300 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-sm">
+                <div class="w-6 h-6 rounded-full bg-gray-500 flex items-center justify-center text-white font-bold text-xs">
+                    {% if comment.author %}{{ comment.author.name|slice:":1"|upper }}{% else %}?{% endif %}
+                </div>
+                <span class="font-semibold text-gray-700">{% if comment.author %}{{ comment.author.name }}{% else %}익명{% endif %}</span>
+                <span class="text-gray-500">{{ comment.created_at|date:"Y.m.d H:i" }}</span>
+            </div>
+        </div>
+
+        <!-- 댓글 내용 -->
+        <div class="p-5 bg-white">
+            <div class="prose max-w-none text-gray-800 leading-relaxed">
+                {{ comment.content|linebreaks }}
+            </div>
+        </div>
+
+        {% if user.is_authenticated and comment.author == user %}
+            <div class="bg-gray-50 px-5 py-3 border-t border-gray-200 flex gap-2">
+                <a href="{% url 'discussions:comment_edit' comment.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            
+                <form method="post" action="{% url 'discussions:comment_delete' comment.id %}">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors">삭제</button>
+                </form>
+            </div>
+        {% endif %}
+
+    </div>
+    {% endfor %}
+{% endif %}
+
+
+<!-- 댓글 등록 -->
+<form method="post" action="{% url 'discussions:comment_create' post.id %}">
+        {% csrf_token %}
+        <textarea name="content" rows="6" required class="w-full p-4 border-0 focus:ring-0 outline-none resize-none" placeholder="Leave a comment"></textarea>
+        <div class="bg-gray-50 px-4 py-3 border-t border-gray-300 flex justify-end items-center">
+            <button type="submit" class="px-4 py-2 bg-[#059212] text-white rounded-md hover:bg-[#06D001] transition-colors font-medium">Comment</button>
+        </div>
+</form>
+
+<!-- 목록 이동 -->
+<div class="mt-6">
+    <a href="{% url 'discussions:post_list' %}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M7.78 12.53a.75.75 0 0 1-1.06 0L2.47 8.28a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L4.81 7h7.44a.75.75 0 0 1 0 1.5H4.81l2.97 2.97a.75.75 0 0 1 0 1.06z"/>
+        </svg>
+        Back to list
+    </a>
+</div>
+</div>
+{% endblock %}
