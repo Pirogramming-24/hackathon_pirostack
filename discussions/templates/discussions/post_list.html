@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}커뮤니티{% endblock %}
 
@@ -7,20 +8,49 @@
     <!-- 사이드바 -->
     <aside class="w-64 flex-shrink-0 border-r border-gray-200 bg-white px-6 py-8 min-h-screen">
         <div class="sticky top-24">
+            {% if show_search_bar %}
+            <form action="" method="get" class="mb-6">
+                <div class="relative">
+                    <input type="text" name="q" value="{{ q }}" placeholder="검색어를 입력하세요" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#059212] transition-colors">
+                    <img src="{% static 'icons/search.svg' %}" alt="검색" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 opacity-50">
+                </div>
+            </form>
+            {% endif %}
+
             <!-- 새 글 작성 버튼 -->
+            {% if current_profile %}
             <a href="{% url 'discussions:post_create' %}" class="block w-full mb-6 px-4 py-2 bg-[#059212] text-white text-center rounded-lg hover:bg-[#06D001] transition-colors font-medium">
                 + 새 글 작성
             </a>
+            {% else %}
+            <a href="{% url 'users:login' %}?next={% url 'discussions:post_create' %}" class="block w-full mb-6 px-4 py-2 bg-[#059212] text-white text-center rounded-lg hover:bg-[#06D001] transition-colors font-medium">
+                + 새 글 작성
+            </a>
+            {% endif %}
 
 
             <!-- 질문 게시판 링크 -->
-            <a href="{% url 'questions:list' %}" class="block px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
-                📋 전체 질문
+            <a href="{% if request.session.is_staff %}{% url 'questions:staff_unanswered' %}{% else %}{% url 'questions:list' %}{% endif %}" class="flex items-center gap-2 px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 198 198" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M140.25 165H33V57.75C33 53.2125 29.2875 49.5 24.75 49.5C20.2125 49.5 16.5 53.2125 16.5 57.75V165C16.5 174.075 23.925 181.5 33 181.5H140.25C144.788 181.5 148.5 177.788 148.5 173.25C148.5 168.712 144.788 165 140.25 165Z" fill="currentColor"/>
+                    <path d="M165 16.5H66C56.925 16.5 49.5 23.925 49.5 33V132C49.5 141.075 56.925 148.5 66 148.5H165C174.075 148.5 181.5 141.075 181.5 132V33C181.5 23.925 174.075 16.5 165 16.5ZM115.583 123.75C110.715 123.75 106.92 119.872 106.92 115.087C106.92 110.22 110.798 106.507 115.583 106.507C120.45 106.507 124.163 110.22 124.163 115.087C124.08 119.872 120.45 123.75 115.583 123.75ZM136.208 72.8475C131.01 80.52 126.06 82.83 123.337 87.78C122.677 88.935 122.265 89.925 122.017 91.8225C121.605 95.04 119.047 97.4325 115.83 97.4325H115.583C111.953 97.4325 109.065 94.2975 109.395 90.6675C109.643 88.3575 110.138 85.965 111.458 83.7375C114.84 77.715 121.193 74.1675 124.905 68.8875C128.865 63.2775 126.638 52.8825 115.5 52.8825C110.467 52.8825 107.167 55.5225 105.105 58.6575C103.537 61.05 100.403 61.875 97.7625 60.72C94.2975 59.235 92.8125 54.945 94.9575 51.8925C99.165 45.7875 106.177 41.25 115.417 41.25C125.565 41.25 132.577 45.87 136.125 51.645C139.178 56.6775 140.91 65.9175 136.208 72.8475Z" fill="currentColor"/>
+                </svg>
+                <span>전체 질문</span>
+            </a>
+
+            <!-- FAQ -->
+            <a href="{% url 'questions:list' %}?filter=faq" class="flex items-center gap-2 px-4 py-2 mb-2 rounded-md hover:bg-gray-50 transition-colors">
+                <img src="{% static 'icons/faq.svg' %}" alt="FAQ" class="w-5 h-5">
+                <span>FAQ</span>
             </a>
 
             <!-- 전체 보기 -->
-            <a href="{% url 'discussions:post_list' %}" class="block px-4 py-2 mb-2 rounded-md bg-gray-100 font-semibold transition-colors">
-                💬 커뮤니티
+            <a href="{% url 'discussions:post_list' %}" class="flex items-center gap-2 px-4 py-2 mb-2 rounded-md bg-gray-100 font-semibold transition-colors">
+                <svg width="20" height="20" viewBox="0 0 195 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M43.3333 102.917V59.5833H27.0833C22.7736 59.5833 18.6403 61.2954 15.5928 64.3429C12.5454 67.3903 10.8333 71.5236 10.8333 75.8333V173.333C10.8414 174.339 11.1294 175.323 11.6652 176.175C12.201 177.026 12.9633 177.712 13.8667 178.154C14.737 178.55 15.6966 178.708 16.648 178.613C17.5994 178.518 18.5086 178.173 19.2833 177.613L47.1792 157.083H119.979C122.032 157.144 124.076 156.783 125.983 156.021C127.891 155.26 129.622 154.115 131.069 152.658C132.516 151.201 133.649 149.462 134.397 147.549C135.145 145.636 135.492 143.59 135.417 141.538V135.417H75.8333C67.2138 135.417 58.9473 131.993 52.8524 125.898C46.7574 119.803 43.3333 111.536 43.3333 102.917Z" fill="currentColor"/>
+                    <path d="M167.917 21.6667H75.8333C71.5236 21.6667 67.3903 23.3787 64.3429 26.4262C61.2954 29.4736 59.5833 33.6069 59.5833 37.9167V102.917C59.5833 107.226 61.2954 111.36 64.3429 114.407C67.3903 117.455 71.5236 119.167 75.8333 119.167H149.229L175.121 139.262C175.891 139.832 176.797 140.187 177.749 140.291C178.7 140.396 179.663 140.246 180.538 139.858C181.459 139.419 182.238 138.729 182.784 137.866C183.331 137.004 183.622 136.004 183.625 134.983V37.9167C183.627 33.6991 181.99 29.6459 179.059 26.6135C176.127 23.5812 172.132 21.8072 167.917 21.6667Z" fill="currentColor"/>
+                </svg>
+                <span>커뮤니티</span>
             </a>
 
             <!-- 정렬 옵션 -->
@@ -58,7 +88,7 @@
                 <div class="flex items-center gap-4 text-sm text-gray-500">
                     <span class="font-medium">{{ post.author.username }}</span>
                     <span>·</span>
-                    <span>{{ post.created_at|timesince }} ago</span>
+                    <span>{{ post.created_at|date:"Y.m.d H:i" }}</span>
                     <span>·</span>
                     <span class="flex items-center gap-1">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">

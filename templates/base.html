@@ -21,25 +21,44 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-white text-black" style="font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif; line-height: 1.4; letter-spacing: -0.025em;">
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#059212] px-8 py-6 shadow-lg">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#059212] px-8 py-4 shadow-lg">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <a href="{% url 'questions:list' %}" class="text-white text-2xl font-semibold tracking-tight">PiroStack</a>
+            <a href="{% if request.session.is_staff %}{% url 'questions:staff_unanswered' %}{% else %}{% url 'questions:list' %}{% endif %}" class="text-white text-2xl font-semibold tracking-tight">PiroStack</a>
 
             {% if request.session.name %}
             <div class="relative">
                 <button onclick="toggleUserMenu()" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <span class="text-white text-sm font-medium">{{ request.session.name }}</span>
-                    <span class="px-2.5 py-1 bg-white/20 text-white text-xs font-semibold rounded-full">
+                    <span class="px-2.5 py-1 bg-white text-[#059212] text-xs font-semibold rounded-full">
                         {% if request.session.is_staff %}운영진{% else %}부원{% endif %}
                     </span>
                 </button>
 
                 <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-                    <a href="{% url 'users:logout' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    <a href="{% url 'users:logout' %}" class="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 161 161">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M40.25 13.4167C34.9125 13.4167 29.7936 15.537 26.0195 19.3111C22.2453 23.0853 20.125 28.2042 20.125 33.5417V127.458C20.125 132.796 22.2453 137.915 26.0195 141.689C29.7936 145.463 34.9125 147.583 40.25 147.583H80.5C85.8375 147.583 90.9564 145.463 94.7305 141.689C98.5047 137.915 100.625 132.796 100.625 127.458V33.5417C100.625 28.2042 98.5047 23.0853 94.7305 19.3111C90.9564 15.537 85.8375 13.4167 80.5 13.4167H40.25ZM109.299 48.9239C110.557 47.6662 112.263 46.9598 114.042 46.9598C115.82 46.9598 117.526 47.6662 118.784 48.9239L145.618 75.7572C146.875 77.0152 147.582 78.7212 147.582 80.5C147.582 82.2788 146.875 83.9848 145.618 85.2428L118.784 112.076C117.519 113.298 115.825 113.974 114.066 113.959C112.307 113.944 110.624 113.238 109.381 111.994C108.137 110.751 107.431 109.068 107.416 107.309C107.401 105.55 108.077 103.856 109.299 102.591L124.681 87.2083H67.0833C65.3042 87.2083 63.5979 86.5016 62.3398 85.2435C61.0818 83.9854 60.375 82.2792 60.375 80.5C60.375 78.7208 61.0818 77.0145 62.3398 75.7565C63.5979 74.4984 65.3042 73.7917 67.0833 73.7917H124.681L109.299 58.4094C108.041 57.1514 107.335 55.4455 107.335 53.6667C107.335 51.8878 108.041 50.1819 109.299 48.9239Z"/>
+                        </svg>
                         로그아웃
                     </a>
                 </div>
             </div>
+            {% endif %}
+            {% if request.session.user_role == 'Super' %}
+            <div class="px-3 mb-2">
+                <a href="{% url 'users:superadmin' %}" 
+                class="flex items-center justify-center gap-2 w-full 
+                        bg-white text-red py-3 rounded-md text-sm font-bold 
+                        transition-all duration-200 shadow-md
+                        hover:bg-[#047a0f] hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.02]
+                        active:scale-[0.98]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    유저관리 마스터
+                </a>
+            </div>
+            <div class="mx-4 my-2 border-t border-gray-50"></div>
             {% endif %}
         </div>
     </nav>

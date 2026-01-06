@@ -8,7 +8,7 @@
 <div class="mb-6">
     <div class="flex items-start gap-3 mb-3">
         <h1 class="text-3xl font-bold flex-1">{{ post.title }}</h1>
-        {% if user.is_authenticated and post.author == user %}
+        {% if current_profile and post.author == current_profile %}
             <div class="flex gap-2">
                 <a href="{% url 'discussions:post_edit' post.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
             </div>
@@ -21,7 +21,7 @@
 
     <div class="flex items-center gap-3 text-sm text-gray-600">
         <span class="font-medium">{{ post.author.username }}</span>
-        <span>opened this discussion {{ post.created_at|timesince }} ago</span>
+        <span>{{ post.created_at|date:"Y.m.d H:i" }}</span>
         <span>·</span>
         <span class="inline-flex items-center gap-1">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
@@ -40,7 +40,7 @@
                 {{ post.author.username|slice:":1"|upper }}
             </div>
             <span class="font-semibold">{{ post.author.username }}</span>
-            <span class="text-gray-500">commented {{ post.created_at|timesince }} ago</span>
+            <span class="text-gray-500">{{ post.created_at|date:"Y.m.d H:i" }}</span>
         </div>
     </div>
 
@@ -79,7 +79,7 @@
                     {{ comment.author.username|slice:":1"|upper }}
                 </div>
                 <span class="font-semibold text-gray-700">{{ comment.author.username }}</span>
-                <span class="text-gray-500">commented {{ comment.created_at|timesince }} ago</span>
+                <span class="text-gray-500">{{ comment.created_at|date:"Y.m.d H:i" }}</span>
             </div>
         </div>
 
@@ -90,7 +90,7 @@
             </div>
         </div>
 
-        {% if user.is_authenticated and comment.author == user %}
+        {% if current_profile and comment.author == current_profile %}
         <a href="{% url 'discussions:comment_edit' comment.id %}">수정</a>
 
         <form method="post"

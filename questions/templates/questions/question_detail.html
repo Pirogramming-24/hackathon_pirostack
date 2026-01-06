@@ -3,6 +3,7 @@
 {% block title %}{{ question.title }}{% endblock %}
 
 {% block content %}
+
 <div class="max-w-5xl mx-auto px-8 py-8">
 <!-- GitHub Issue 스타일 헤더 -->
 <div class="mb-6">
@@ -32,7 +33,7 @@
             {% endif %}
         </span>
         <span class="font-medium">{% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %}</span>
-        <span>opened this question {{ question.created_at|timesince }} ago</span>
+        <span>{{ question.created_at|date:"Y.m.d H:i" }}</span>
         <span>·</span>
         <span class="inline-flex items-center gap-1">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
@@ -51,7 +52,7 @@
                 {% if question.is_anonymous %}?{% else %}{{ question.author.username|slice:":1"|upper }}{% endif %}
             </div>
             <span class="font-semibold">{% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %}</span>
-            <span class="text-gray-500">commented {{ question.created_at|timesince }} ago</span>
+            <span class="text-gray-500">{{ question.created_at|date:"Y.m.d H:i" }}</span>
         </div>
         <span class="text-xs bg-gray-200 px-2 py-0.5 rounded">{{ question.category.name }}</span>
     </div>
@@ -118,7 +119,7 @@
                     {% if answer.is_staff %}
                         <span class="px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full font-medium">운영진</span>
                     {% endif %}
-                    <span class="text-gray-500">commented {{ answer.created_at|timesince }} ago</span>
+                    <span class="text-gray-500">{{ answer.created_at|date:"Y.m.d H:i" }}</span>
                 </div>
             </div>
 
@@ -141,7 +142,7 @@
                                 <span class="text-sm font-semibold text-gray-700">
                                     {% if reply.is_anonymous %}익명{% else %}{{ reply.author.username }}{% endif %}
                                 </span>
-                                <span class="text-xs text-gray-500">{{ reply.created_at|timesince }} ago</span>
+                                <span class="text-xs text-gray-500">{{ reply.created_at|date:"Y.m.d H:i" }}</span>
                             </div>
                             <div class="text-sm text-gray-800 leading-relaxed">
                                 {{ reply.content|linebreaks }}
@@ -190,12 +191,12 @@
 </div>
 
 <div class="mt-6">
-    {% if user.is_staff %}
+    {% if request.session.is_staff %}
         <a href="{% url 'questions:staff_unanswered' %}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M7.78 12.53a.75.75 0 0 1-1.06 0L2.47 8.28a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L4.81 7h7.44a.75.75 0 0 1 0 1.5H4.81l2.97 2.97a.75.75 0 0 1 0 1.06z"/>
             </svg>
-            Back to staff dashboard
+            Back to list
         </a>
     {% else %}
         <a href="{% url 'questions:list' %}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800">
