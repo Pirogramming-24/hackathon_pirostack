@@ -3,6 +3,7 @@ from .models import Category, Question, Answer
 
 # Register your models here.
 
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'category_type', 'created_at']
