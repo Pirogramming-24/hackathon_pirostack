@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}카테고리 삭제{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto p-8 bg-white rounded shadow text-center">
+    <h1 class="text-2xl font-bold mb-4">카테고리 삭제</h1>
+    <p class="mb-6">{{ category.name }} 카테고리를 삭제하시겠습니까?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded">삭제</button>
+        <a href="{% url 'questions:category_list' %}" class="px-4 py-2 bg-gray-300 text-black rounded">취소</a>
+    </form>
+</div>
+{% endblock %}
