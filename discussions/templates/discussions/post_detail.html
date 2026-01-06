@@ -21,7 +21,7 @@
 
     <div class="flex items-center gap-3 text-sm text-gray-600">
         <span class="font-medium">{{ post.author.username }}</span>
-        <span>opened this discussion {{ post.created_at|timesince }} ago</span>
+        <span>{{ post.created_at|date:"Y.m.d H:i" }}</span>
         <span>·</span>
         <span class="inline-flex items-center gap-1">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
@@ -40,7 +40,7 @@
                 {{ post.author.username|slice:":1"|upper }}
             </div>
             <span class="font-semibold">{{ post.author.username }}</span>
-            <span class="text-gray-500">commented {{ post.created_at|timesince }} ago</span>
+            <span class="text-gray-500">{{ post.created_at|date:"Y.m.d H:i" }}</span>
         </div>
     </div>
 
@@ -79,7 +79,7 @@
                     {{ comment.author.username|slice:":1"|upper }}
                 </div>
                 <span class="font-semibold text-gray-700">{{ comment.author.username }}</span>
-                <span class="text-gray-500">commented {{ comment.created_at|timesince }} ago</span>
+                <span class="text-gray-500">{{ comment.created_at|date:"Y.m.d H:i" }}</span>
             </div>
         </div>
 

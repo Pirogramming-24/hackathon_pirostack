@@ -8,20 +8,33 @@
     <aside class="w-64 flex-shrink-0 border-r border-gray-200 bg-white px-6 py-8 min-h-screen">
         <div class="sticky top-24">
             <!-- 전체 보기 -->
-            <a href="{% url 'questions:staff_unanswered' %}" class="block px-4 py-2 mb-2 rounded-md {% if not selected_category %}bg-gray-100 font-semibold{% else %}hover:bg-gray-50{% endif %} transition-colors">
-                📋 전체 질문
+            <a href="{% url 'questions:staff_unanswered' %}" class="flex items-center gap-2 px-4 py-2 mb-2 rounded-md {% if not selected_category %}bg-gray-100 font-semibold{% else %}hover:bg-gray-50{% endif %} transition-colors">
+                <svg width="20" height="20" viewBox="0 0 198 198" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M140.25 165H33V57.75C33 53.2125 29.2875 49.5 24.75 49.5C20.2125 49.5 16.5 53.2125 16.5 57.75V165C16.5 174.075 23.925 181.5 33 181.5H140.25C144.788 181.5 148.5 177.788 148.5 173.25C148.5 168.712 144.788 165 140.25 165Z" fill="currentColor"/>
+                    <path d="M165 16.5H66C56.925 16.5 49.5 23.925 49.5 33V132C49.5 141.075 56.925 148.5 66 148.5H165C174.075 148.5 181.5 141.075 181.5 132V33C181.5 23.925 174.075 16.5 165 16.5ZM115.583 123.75C110.715 123.75 106.92 119.872 106.92 115.087C106.92 110.22 110.798 106.507 115.583 106.507C120.45 106.507 124.163 110.22 124.163 115.087C124.08 119.872 120.45 123.75 115.583 123.75ZM136.208 72.8475C131.01 80.52 126.06 82.83 123.337 87.78C122.677 88.935 122.265 89.925 122.017 91.8225C121.605 95.04 119.047 97.4325 115.83 97.4325H115.583C111.953 97.4325 109.065 94.2975 109.395 90.6675C109.643 88.3575 110.138 85.965 111.458 83.7375C114.84 77.715 121.193 74.1675 124.905 68.8875C128.865 63.2775 126.638 52.8825 115.5 52.8825C110.467 52.8825 107.167 55.5225 105.105 58.6575C103.537 61.05 100.403 61.875 97.7625 60.72C94.2975 59.235 92.8125 54.945 94.9575 51.8925C99.165 45.7875 106.177 41.25 115.417 41.25C125.565 41.25 132.577 45.87 136.125 51.645C139.178 56.6775 140.91 65.9175 136.208 72.8475Z" fill="currentColor"/>
+                </svg>
+                <span>전체 질문</span>
             </a>
 
             <!-- 커뮤니티 링크 -->
-            <a href="{% url 'discussions:post_list' %}" class="block px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
-                💬 커뮤니티
+            <a href="{% url 'discussions:post_list' %}" class="flex items-center gap-2 px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 195 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M43.3333 102.917V59.5833H27.0833C22.7736 59.5833 18.6403 61.2954 15.5928 64.3429C12.5454 67.3903 10.8333 71.5236 10.8333 75.8333V173.333C10.8414 174.339 11.1294 175.323 11.6652 176.175C12.201 177.026 12.9633 177.712 13.8667 178.154C14.737 178.55 15.6966 178.708 16.648 178.613C17.5994 178.518 18.5086 178.173 19.2833 177.613L47.1792 157.083H119.979C122.032 157.144 124.076 156.783 125.983 156.021C127.891 155.26 129.622 154.115 131.069 152.658C132.516 151.201 133.649 149.462 134.397 147.549C135.145 145.636 135.492 143.59 135.417 141.538V135.417H75.8333C67.2138 135.417 58.9473 131.993 52.8524 125.898C46.7574 119.803 43.3333 111.536 43.3333 102.917Z" fill="currentColor"/>
+                    <path d="M167.917 21.6667H75.8333C71.5236 21.6667 67.3903 23.3787 64.3429 26.4262C61.2954 29.4736 59.5833 33.6069 59.5833 37.9167V102.917C59.5833 107.226 61.2954 111.36 64.3429 114.407C67.3903 117.455 71.5236 119.167 75.8333 119.167H149.229L175.121 139.262C175.891 139.832 176.797 140.187 177.749 140.291C178.7 140.396 179.663 140.246 180.538 139.858C181.459 139.419 182.238 138.729 182.784 137.866C183.331 137.004 183.622 136.004 183.625 134.983V37.9167C183.627 33.6991 181.99 29.6459 179.059 26.6135C176.127 23.5812 172.132 21.8072 167.917 21.6667Z" fill="currentColor"/>
+                </svg>
+                <span>커뮤니티</span>
             </a>
 
              <!-- 세션 카테고리 -->
             <div class="mb-4">
                 <details open class="group">
                     <summary class="flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-gray-50 rounded-md font-medium text-gray-700">
-                        <span>📚 세션</span>
+                        <span class="flex items-center gap-2">
+                            <svg width="20" height="20" viewBox="0 0 165 165" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M137.5 116.875C141.147 116.875 144.644 115.426 147.223 112.848C149.801 110.269 151.25 106.772 151.25 103.125V27.5C151.25 23.8533 149.801 20.3559 147.223 17.7773C144.644 15.1987 141.147 13.75 137.5 13.75H65.0375C67.4438 17.9438 68.75 22.6875 68.75 27.5H137.5V103.125H75.625V116.875M103.125 48.125V61.875H61.875V151.25H48.125V110H34.375V151.25H20.625V96.25H10.3125V61.875C10.3125 58.2283 11.7612 54.7309 14.3398 52.1523C16.9184 49.5737 20.4158 48.125 24.0625 48.125H103.125ZM55 27.5C55 31.1467 53.5513 34.6441 50.9727 37.2227C48.3941 39.8013 44.8967 41.25 41.25 41.25C37.6033 41.25 34.1059 39.8013 31.5273 37.2227C28.9487 34.6441 27.5 31.1467 27.5 27.5C27.5 23.8533 28.9487 20.3559 31.5273 17.7773C34.1059 15.1987 37.6033 13.75 41.25 13.75C44.8967 13.75 48.3941 15.1987 50.9727 17.7773C53.5513 20.3559 55 23.8533 55 27.5Z" fill="currentColor"/>
+                            </svg>
+                            <span>세션</span>
+                        </span>
                         <svg class="w-4 h-4 transition-transform group-open:rotate-90" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                         </svg>
@@ -43,7 +56,12 @@
             <div class="mb-4">
                 <details open class="group">
                     <summary class="flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-gray-50 rounded-md font-medium text-gray-700">
-                        <span>📝 과제</span>
+                        <span class="flex items-center gap-2">
+                            <svg width="20" height="20" viewBox="0 0 165 165" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M50.985 20.625C49.0956 24.9627 48.1219 29.6437 48.125 34.375C48.125 38.0217 49.5737 41.5191 52.1523 44.0977C54.7309 46.6763 58.2283 48.125 61.875 48.125H103.125C106.772 48.125 110.269 46.6763 112.848 44.0977C115.426 41.5191 116.875 38.0217 116.875 34.375C116.875 29.4869 115.857 24.8325 114.015 20.625H123.75C127.397 20.625 130.894 22.0737 133.473 24.6523C136.051 27.2309 137.5 30.7283 137.5 34.375V137.5C137.5 141.147 136.051 144.644 133.473 147.223C130.894 149.801 127.397 151.25 123.75 151.25H41.25C37.6033 151.25 34.1059 149.801 31.5273 147.223C28.9487 144.644 27.5 141.147 27.5 137.5V34.375C27.5 30.7283 28.9487 27.2309 31.5273 24.6523C34.1059 22.0737 37.6033 20.625 41.25 20.625H50.985ZM82.5 96.25H61.875C60.0516 96.25 58.303 96.9743 57.0136 98.2636C55.7243 99.553 55 101.302 55 103.125C55 104.948 55.7243 106.697 57.0136 107.986C58.303 109.276 60.0516 110 61.875 110H82.5C84.3234 110 86.072 109.276 87.3614 107.986C88.6507 106.697 89.375 104.948 89.375 103.125C89.375 101.302 88.6507 99.553 87.3614 98.2636C86.072 96.9743 84.3234 96.25 82.5 96.25ZM103.125 68.75H61.875C60.1227 68.7519 58.4373 69.4229 57.1631 70.6258C55.8889 71.8287 55.1221 73.4728 55.0194 75.2221C54.9167 76.9714 55.4859 78.6939 56.6106 80.0376C57.7353 81.3813 59.3306 82.2449 61.0706 82.4519L61.875 82.5H103.125C104.948 82.5 106.697 81.7757 107.986 80.4864C109.276 79.197 110 77.4484 110 75.625C110 73.8016 109.276 72.053 107.986 70.7636C106.697 69.4743 104.948 68.75 103.125 68.75ZM82.5 13.75C85.4018 13.7501 88.2709 14.3625 90.9199 15.5471C93.5688 16.7318 95.938 18.4621 97.8725 20.625C100.815 23.9112 102.713 28.1394 103.063 32.8075L103.125 34.375H61.875C61.875 29.3906 63.6419 24.8188 66.5844 21.2575L67.1275 20.625C70.9087 16.4037 76.395 13.75 82.5 13.75Z" fill="currentColor"/>
+                            </svg>
+                            <span>과제</span>
+                        </span>
                         <svg class="w-4 h-4 transition-transform group-open:rotate-90" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                         </svg>
@@ -62,8 +80,11 @@
             </div>
 
             <!-- 카테고리 관리 -->
-            <a href="{% url 'questions:category_list' %}" class="block px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
-                #️⃣ 카테고리 관리
+            <a href="{% url 'questions:category_list' %}" class="flex items-center gap-2 px-4 py-2 mb-4 rounded-md hover:bg-gray-50 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 157 157" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M65.4167 19.625H26.1667C24.4317 19.625 22.7678 20.3142 21.541 21.541C20.3142 22.7678 19.625 24.4317 19.625 26.1667V65.4167C19.625 67.1516 20.3142 68.8155 21.541 70.0423C22.7678 71.2691 24.4317 71.9583 26.1667 71.9583H65.4167C67.1516 71.9583 68.8155 71.2691 70.0423 70.0423C71.2691 68.8155 71.9583 67.1516 71.9583 65.4167V26.1667C71.9583 24.4317 71.2691 22.7678 70.0423 21.541C68.8155 20.3142 67.1516 19.625 65.4167 19.625ZM130.833 19.625H91.5833C89.8484 19.625 88.1845 20.3142 86.9577 21.541C85.7309 22.7678 85.0417 24.4317 85.0417 26.1667V65.4167C85.0417 67.1516 85.7309 68.8155 86.9577 70.0423C88.1845 71.2691 89.8484 71.9583 91.5833 71.9583H130.833C132.568 71.9583 134.232 71.2691 135.459 70.0423C136.686 68.8155 137.375 67.1516 137.375 65.4167V26.1667C137.375 24.4317 136.686 22.7678 135.459 21.541C134.232 20.3142 132.568 19.625 130.833 19.625ZM65.4167 85.0417H26.1667C24.4317 85.0417 22.7678 85.7309 21.541 86.9577C20.3142 88.1845 19.625 89.8484 19.625 91.5833V130.833C19.625 132.568 20.3142 134.232 21.541 135.459C22.7678 136.686 24.4317 137.375 26.1667 137.375H65.4167C67.1516 137.375 68.8155 136.686 70.0423 135.459C71.2691 134.232 71.9583 132.568 71.9583 130.833V91.5833C71.9583 89.8484 71.2691 88.1845 70.0423 86.9577C68.8155 85.7309 67.1516 85.0417 65.4167 85.0417ZM111.208 85.0417C116.328 85.0417 121.335 86.5435 125.609 89.3611C129.884 92.1787 133.238 96.1883 135.256 100.893C137.274 105.598 137.868 110.792 136.963 115.831C136.059 120.87 133.696 125.533 130.168 129.242C126.639 132.952 122.1 135.545 117.113 136.7C112.125 137.855 106.909 137.522 102.109 135.742C97.3085 133.961 93.1362 130.812 90.1084 126.684C87.0806 122.556 85.3304 117.63 85.0744 112.517L85.0417 111.208L85.0744 109.9C85.41 103.195 88.3099 96.8756 93.1742 92.2488C98.0385 87.6219 104.495 85.0417 111.208 85.0417Z" fill="currentColor"/>
+                </svg>
+                <span>카테고리 관리</span>
             </a>
         </div>
     </aside>
@@ -71,45 +92,39 @@
     <!-- 메인 컨텐츠 -->
     <main class="flex-1 min-w-0 max-w-5xl mx-auto px-8 py-8">
         <div class="mb-6">
-            <h1 class="text-3xl font-bold mb-2">
-                {% if selected_category %}{{ selected_category.name }}{% else %}전체 질문{% endif %}
-            </h1>
-            <p class="text-gray-600">총 {{ questions.count }}개의 질문</p>
-            <!-- Filter Bar -->
-        <div class="w-full flex items-center gap-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-3xl font-bold">
+                    {% if selected_category %}{{ selected_category.name }}{% else %}전체 질문{% endif %}
+                </h1>
 
-            <!-- Sort/Category -->
-            <form method="get" class="flex items-center gap-4">
-
-            <!-- 정렬 -->
-            <div class="flex items-center gap-2">
-                <span class="typo-body-1">정렬</span>
-                <select name="sort" class="typo-body-1 border border-gray-300 rounded px-2 py-1 h-9">
-                    <option value="latest" {% if sort == "latest" %}selected{% endif %}>최신순</option>
-                    <option value="oldest" {% if sort == "oldest" %}selected{% endif %}>오래된순</option>
-                </select>
+                <!-- 정렬 (오른쪽) -->
+                <form method="get">
+                    <input type="hidden" name="include_answered" value="{{ include_answered }}">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-gray-700">정렬</label>
+                        <select name="sort" onchange="this.form.submit()" class="text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#059212] focus:border-transparent">
+                            <option value="latest" {% if sort == "latest" %}selected{% endif %}>최신순</option>
+                            <option value="oldest" {% if sort == "oldest" %}selected{% endif %}>오래된순</option>
+                        </select>
+                    </div>
+                </form>
             </div>
-            <label class="flex items-center gap-2 cursor-pointer">
+
+            <!-- 이전 질문까지 보기 체크박스 -->
+            <form method="get">
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <label class="flex items-center gap-2 cursor-pointer">
                     <input
                         type="checkbox"
-                        name="only_unanswered"
+                        name="include_answered"
                         value="1"
-                        class="w-4 h-4"
-                        {% if only_unanswered == "1" %}checked{% endif %}
+                        class="w-4 h-4 text-[#059212] border-gray-300 rounded focus:ring-[#059212]"
+                        onchange="this.form.submit()"
+                        {% if include_answered == "1" %}checked{% endif %}
                     >
-                    <span class="typo-body-1 font-medium">미답변만</span>
+                    <span class="text-sm font-medium text-gray-700">이전 질문까지 보기</span>
                 </label>
-
-                <button
-                    type="submit"
-                    class="px-4 py-1.5 bg-[#059212] text-white rounded-lg h-9 flex items-center"
-                >
-                    적용
-                </button>
-
-        </form>
-
-
+            </form>
         </div>
 
         {% if questions %}
@@ -139,7 +154,7 @@
                     <div class="flex items-center gap-4 text-sm text-gray-500">
                         <span>{% if question.is_anonymous %}익명{% else %}{{ question.author.username }}{% endif %}</span>
                         <span>·</span>
-                        <span>{{ question.created_at|timesince }} ago</span>
+                        <span>{{ question.created_at|date:"Y.m.d H:i" }}</span>
                         <span>·</span>
                         <span class="flex items-center gap-1">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
