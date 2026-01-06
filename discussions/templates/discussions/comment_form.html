@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}댓글 수정{% endblock %}
+
+{% block content %}
+<h2>댓글 수정</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <textarea name="content" rows="4" style="width:100%;" required>
+{{ comment.content }}
+    </textarea>
+    <br>
+    <button type="submit">수정 완료</button>
+    <a href="{% url 'discussions:post_detail' post_id %}">취소</a>
+</form>
+{% endblock %}

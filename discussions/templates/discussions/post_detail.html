@@ -113,24 +113,25 @@
 
 
 <!-- 댓글 부분 -->
-<hr>
-
 <h3>댓글</h3>
 
 {% for comment in comments %}
-    <div style="margin-bottom: 10px;">
+    <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ddd;">
         <strong>{{ comment.author }}</strong>
         <small>{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+
         <p>{{ comment.content }}</p>
 
-
-        <!-- 임시 -->
         {% comment %}
-        로그인 연동 후 작성자만 댓글 삭제 가능
+        로그인 연동 후 작성자만 댓글 수정/삭제 가능
         {% if user.is_authenticated and comment.author == user %}
         {% endcomment %}
-        
-        <form method="post" action="{% url 'discussions:comment_delete' comment.id %}"
+
+        <!-- 임시 -->
+        <a href="{% url 'discussions:comment_edit' comment.id %}">수정</a>
+
+        <form method="post"
+              action="{% url 'discussions:comment_delete' comment.id %}"
               style="display:inline;">
             {% csrf_token %}
             <button type="submit">삭제</button>
@@ -139,7 +140,6 @@
         {% comment %}
         {% endif %}
         {% endcomment %}
-
     </div>
     <form method="post" action="{% url 'discussions:comment_create' post.id %}">
         {% csrf_token %}
