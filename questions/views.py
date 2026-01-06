@@ -1,12 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 from .models import Question, Category, Answer
 from .forms import QuestionForm, AnswerForm
 from django.db.models import Q
 from django.db.models import Count
 from users.decorators import staff_required
-from users.models import Profile 
-from django.contrib.auth.decorators import login_required
+from users.models import Profile
 
 # Create your views here.
 
@@ -138,14 +138,27 @@ def my_questions(request):
     return render(request, "questions/question_list.html", context)
 
 
+def get_current_profile(request):
+    """세션 또는 미들웨어에서 현재 프로필 가져오기"""
+    if getattr(request, "user_profile", None):
+        return request.user_profile
+
+    profile_id = request.session.get("user_id") or request.session.get("profile_id")
+    if profile_id:
+        try:
+            return Profile.objects.get(pk=profile_id)
+        except Profile.DoesNotExist:
+            return None
+    return None
+
+
 def my_scrapped_questions(request):
 
     #  내가 찜한 질문들 가져오기
-    profile_id = request.session.get("profile_id")
-    if not profile_id:
+    profile = get_current_profile(request)
+    if not profile:
         return redirect("users:login")
 
-    profile = get_object_or_404(Profile, pk=profile_id)
     questions = Question.objects.filter(scraps=profile)
     faq_questions = Question.objects.filter(is_faq=True).order_by(
         "faq_order", "-created_at"
@@ -174,15 +187,14 @@ def my_scrapped_questions(request):
 
 # 찜기능 구현
 def toggle_scrap(request, pk):
-    print("DEBUG session profile_id:", request.session.get("profile_id"))
-    print("DEBUG django auth:", request.user.is_authenticated, request.user)
     if request.method != "POST":
         return redirect("questions:detail", pk=pk)
 
     question = get_object_or_404(Question, pk=pk)
 
-    # Django 로그인 기반으로 Profile 매핑 (username = phone_number)
-    profile = get_object_or_404(Profile, phone_number=request.user.username)
+    profile = get_current_profile(request)
+    if not profile:
+        return redirect("users:login")
 
     if question.scraps.filter(pk=profile.pk).exists():
         question.scraps.remove(profile)
@@ -192,27 +204,12 @@ def toggle_scrap(request, pk):
     ref = request.META.get("HTTP_REFERER")
     return redirect(ref) if ref else redirect("questions:detail", pk=pk)
 
-    profile = get_object_or_404(Profile, pk=profile_id)
-
-    if question.scraps.filter(pk=profile.pk).exists():
-        question.scraps.remove(profile)
-    else:
-        question.scraps.add(profile)
-
-    ref = request.META.get("HTTP_REFERER")
-    if ref:
-        return redirect(ref)
-    return redirect("questions:detail", pk=pk)
-
 
 def question_detail(request, pk):
     """질문 상세 페이지"""
     question = get_object_or_404(Question, pk=pk)
     answers = question.answers.all()
-    profile = None
-    profile_id = request.session.get("profile_id")
-    if profile_id:
-        profile = Profile.objects.filter(pk=profile_id).first()
+    profile = get_current_profile(request)
     context = {
         "is_staff": request.is_staff,  # 운영진 여부 전달
         "question": question,
@@ -228,7 +225,7 @@ def question_create(request):
         form = QuestionForm(request.POST)
         if form.is_valid():
             question = form.save(commit=False)
-            question.author = None
+            question.author = get_current_profile(request)
             question.is_anonymous = True
             question.save()
             return redirect("questions:detail", pk=question.pk)
@@ -262,9 +259,10 @@ def answer_create(request, pk):
         if form.is_valid():
             answer = form.save(commit=False)
             answer.question = question
-            answer.author = None
+            profile = get_current_profile(request)
+            answer.author = profile
             answer.is_anonymous = True
-            answer.is_staff = False
+            answer.is_staff = profile.is_staff if profile else False
             answer.save()
 
     return redirect("questions:detail", pk=pk)
@@ -373,7 +371,7 @@ def reply_create(request, pk, answer_pk):
             reply = form.save(commit=False)
             reply.question = question
             reply.parent = parent_answer
-            reply.author = None
+            reply.author = get_current_profile(request)
             reply.is_anonymous = True
             reply.is_staff = False
             reply.save()

@@ -14,6 +14,8 @@ class SessionUserMiddleware(MiddlewareMixin):
                 # request에 사용자 정보 추가
                 request.user_profile = profile
                 request.is_staff = request.session.get('is_staff', False)
+                # login_required에서 통과하도록 request.user도 프로필로 설정
+                request.user = profile
             except Profile.DoesNotExist:
                 request.user_profile = None
                 request.is_staff = False

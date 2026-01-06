@@ -62,8 +62,6 @@ def post_detail(request, post_id):
 
 def post_create(request):
     profile = get_current_profile(request)
-    if not profile:
-        return redirect("users:login")
 
     if request.method == "POST":
         title = request.POST.get("title")
@@ -81,8 +79,6 @@ def post_create(request):
 
 def comment_create(request, post_id):
     profile = get_current_profile(request)
-    if not profile:
-        return redirect("users:login")
 
     post = get_object_or_404(DiscussionPost, id=post_id)
     if request.method == "POST":

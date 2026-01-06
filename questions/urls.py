@@ -19,7 +19,6 @@ urlpatterns = [
         name="reply_create",
     ),
     path("<int:pk>/resolve/", views.question_resolve, name="resolve"),
-    path("<int:pk>/scrap/", views.question_scrap, name="scrap"),
     path("<int:pk>/faq/", views.question_faq, name="faq"),
     path("<int:pk>/update/", views.question_update, name="update"),
     path("<int:pk>/delete/", views.question_delete, name="delete"),
