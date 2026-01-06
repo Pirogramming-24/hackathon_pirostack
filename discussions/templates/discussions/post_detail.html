@@ -11,11 +11,12 @@
         {% if user.is_authenticated and post.author == user %}
             <div class="flex gap-2">
                 <a href="{% url 'discussions:post_edit' post.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            
+                <form method="post" action="{% url 'discussions:post_delete' post.id %}">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors">삭제</button>
+                </form>
             </div>
-            <form method="post" action="{% url 'discussions:post_delete' post.id %}">
-            {% csrf_token %}
-            <button type="submit">삭제</button>
-            </form>
         {% endif %}
     </div>
 
@@ -45,7 +46,7 @@
     </div>
 
     <div class="p-5 bg-white">
-        <div class="prose max-w-none text-gray-800 leading-relaxed mb-4">
+        <div class="prose max-w-none text-gray-800 leading-relaxed mb-4 whitespace-pre-wrap">
             {{ post.content|linebreaks }}
         </div>
 
@@ -85,21 +86,22 @@
 
         <!-- 댓글 내용 -->
         <div class="p-5 bg-white">
-            <div class="prose max-w-none text-gray-800 leading-relaxed">
+            <div class="prose max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap">
                 {{ comment.content|linebreaks }}
             </div>
         </div>
 
         {% if user.is_authenticated and comment.author == user %}
-        <a href="{% url 'discussions:comment_edit' comment.id %}">수정</a>
-
-        <form method="post"
-              action="{% url 'discussions:comment_delete' comment.id %}"
-              style="display:inline;">
-            {% csrf_token %}
-            <button type="submit">삭제</button>
-        </form>
+            <div class="bg-gray-50 px-5 py-3 border-t border-gray-200 flex gap-2">
+                <a href="{% url 'discussions:comment_edit' comment.id %}" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">수정</a>
+            
+                <form method="post" action="{% url 'discussions:comment_delete' comment.id %}">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded-md hover:bg-red-50 transition-colors">삭제</button>
+                </form>
+            </div>
         {% endif %}
+
     </div>
     {% endfor %}
 {% endif %}
