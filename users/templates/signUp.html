@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="content">
+        <form method="POST">
+            {%csrf_token%}
+            <select name="role" id="role">
+                <option value="Executive">운영진</option>
+                <option value="Member">부원</option>
+            </select>
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" required>
+            <label for="phone_number">전화번호</label>
+            <input type="tel" id="phone_number" name="phone_number" 
+                                placeholder="12345678" pattern="[0-9]{8}" required>
+            <button type="submit">제출</button>
+            <a href="{% url 'users:login' %}">로그인 폼으로 되돌아가기</a>
+        </form>
+    </div>
+</body>
+</html>
