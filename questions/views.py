@@ -170,6 +170,7 @@ def question_detail(request, pk):
     context = {
         "question": question,
         "answers": answers,
+        "user": request.user,
     }
     return render(request, "questions/question_detail.html", context)
 
@@ -299,6 +300,52 @@ def reply_create(request, pk, answer_pk):
 """
 [김서윤] 운영진 대시보드
 """
+
+@staff_required
+def staff_list_by_category(request, category_id):
+    """운영자용 카테고리별 질문 목록"""
+    category = get_object_or_404(Category, pk=category_id)
+    questions = Question.objects.filter(category=category)
+
+    # 미답변 필터
+    only_unanswered_param = request.GET.get("only_unanswered")
+    if only_unanswered_param == "1":
+        questions = questions.filter(is_resolved=False)
+
+    # 정렬
+    sort = request.GET.get("sort", "latest")
+    if sort == "latest":
+        questions = questions.order_by("-created_at")
+    elif sort == "oldest":
+        questions = questions.order_by("created_at")
+
+    # 카테고리 정보
+    categories = Category.objects.all().order_by("name")
+    session_categories = Category.objects.filter(category_type="session").order_by("name")
+    assignment_categories = Category.objects.filter(category_type="assignment").order_by("name")
+
+    # 통계
+    total_unanswered = Question.objects.filter(is_resolved=False).count()
+    category_stats = (
+        Question.objects.filter(is_resolved=False)
+        .values("category__name")
+        .annotate(count=Count("id"))
+    )
+
+    context = {
+        "questions": questions,
+        "sort": sort,
+        "only_unanswered": only_unanswered_param or "0",
+        "total_unanswered": total_unanswered,
+        "category_stats": category_stats,
+        "categories": categories,
+        "session_categories": session_categories,
+        "assignment_categories": assignment_categories,
+        "selected_category": category,
+    }
+
+    return render(request, "questions/staff_unanswered.html", context)
+
 
 @staff_required
 def staff_unanswered(request):
