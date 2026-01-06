@@ -14,6 +14,7 @@ urlpatterns = [
     path('<int:pk>/update/', views.question_update, name='update'),
     path('<int:pk>/delete/', views.question_delete, name='delete'),
     path('staff/', views.staff_unanswered, name='staff_unanswered'),
+    path('staff/category/<int:category_id>/', views.staff_list_by_category, name='staff_list_by_category'),
     path('my/',views.my_questions, name="my_questions"),
     path('scrapped/',views.my_scrapped_questions, name="my_scrapped_questions"),
     path("<int:pk>/scrap/", views.toggle_scrap, name="toggle_scrap"),
